@@ -1,304 +1,1180 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SC-200 Treino</title>
+<!doctype html><html lang="pt-BR"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Treino SC-200</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-:root{
-  --bg:#f3f4f4; --card:#ffffff; --border:#dfe3e3; --text:#1d2626; --muted:#6b7676;
-  --accent:#1f6f6b; --accent-soft:#8fbcba; --chip:#e8ecec; --code:#eef1f1;
-  --ok:#1e7a46; --ok-bg:#e6f4ec; --bad:#b3261e; --bad-bg:#fbeaea;
-  --hint:#fbebd5; --hint-border:#d39a4a; --hint-title:#9a5b0c; --mark:#7a4fb5;
+/* Layout: console de SOC — barra fixa de status no topo, um cartão de questão por vez, grade de navegação abaixo */
+:root {
+  --bg: #f3f6f7; --surface: #ffffff; --sunk: #e8eef0; --line: #cfdadd;
+  --fg: #142126; --muted: #536a71; --accent: #0d6a74; --accent-ink: #ffffff; --accent-soft: #d6ecee;
+  --ok: #17803d; --ok-soft: #dcf2e3; --bad: #b42318; --bad-soft: #fbe3e0; --warn: #a15c00; --warn-soft: #fbedd5;
+  --f-display: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+  --r: 10px;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#121717; --card:#1a2121; --border:#2c3636; --text:#e4ebeb; --muted:#93a0a0;
-    --accent:#4fb3ad; --accent-soft:#2f6764; --chip:#263030; --code:#243030;
-    --ok:#5fcf8f; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#3a1c1a;
-    --hint:#2e2618; --hint-border:#a5762f; --hint-title:#e7b56a; --mark:#b38ef0;
-  }
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:1.5}
-header{background:var(--card);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:5}
-.brand{font-weight:700;font-size:1.15rem}.brand span{color:var(--accent)}
-.counter{font-family:"IBM Plex Mono",monospace;font-size:.85rem;color:var(--muted);white-space:nowrap}
-main{max-width:860px;margin:0 auto;padding:20px 16px 40px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
-.chip{display:inline-block;background:var(--chip);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600}
-.qnum{margin:14px 0 2px;font-size:.75rem;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
-.qtext{margin:0 0 18px;font-size:1.05rem}
-.opts{display:flex;flex-direction:column;gap:10px}
-.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;color:inherit;font:inherit}
-.opt:hover:not(:disabled){border-color:var(--accent)}
-.opt .letter{flex:none;width:28px;height:28px;border-radius:6px;background:var(--chip);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.85rem}
-.opt code{font-family:"IBM Plex Mono",monospace;background:var(--code);padding:2px 6px;border-radius:4px;font-size:.92rem;word-break:break-word}
-.opt.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.opt.sel .letter{background:var(--accent);color:#fff}
-.opt.elim{opacity:.4;cursor:not-allowed;text-decoration:line-through}
-.opt.correct{border-color:var(--ok);background:var(--ok-bg)}
-.opt.correct .letter{background:var(--ok);color:#fff}
-.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
-.opt.wrong .letter{background:var(--bad);color:#fff}
-.opt:disabled{cursor:default}
-.box{margin-top:18px;border-radius:8px;padding:12px 14px}
-.hints{background:var(--hint);border:1px dashed var(--hint-border)}
-.box h4{margin:0 0 6px;font-size:.72rem;letter-spacing:.08em;color:var(--hint-title)}
-.box p{margin:4px 0}
-.expl.ok{background:var(--ok-bg);border:1px solid var(--ok)}
-.expl.bad{background:var(--bad-bg);border:1px solid var(--bad)}
-.expl h4{color:inherit}
-.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;align-items:center}
-.spacer{flex:1}
-.btn{font:inherit;font-weight:600;border-radius:8px;padding:10px 16px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
-.btn:hover:not(:disabled){border-color:var(--accent)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.primary:disabled{background:var(--accent-soft);border-color:var(--accent-soft);opacity:1}
-.btn.marked{border-color:var(--mark);color:var(--mark)}
-.btn.small{padding:6px 12px;font-size:.85rem}
-.grid-wrap{margin-top:18px}
-.grid-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.grid-head h3{margin:0;font-size:.95rem}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;color:var(--muted)}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px}
-.cell{font-family:"IBM Plex Mono",monospace;font-size:.8rem;height:34px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;position:relative}
-.cell.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
-.cell.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
-.cell.cur{box-shadow:0 0 0 2px var(--accent)}
-.cell.mk::after{content:"";position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--mark)}
-.result h2{margin:0 0 4px}
-.score{font-size:2.4rem;font-weight:700;margin:8px 0}
-.bar{height:8px;background:var(--chip);border-radius:99px;overflow:hidden}
-.bar>div{height:100%;background:var(--accent)}
-.dom{margin:12px 0}
-.dom-row{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:4px}
-.wrong-list{padding-left:18px}.wrong-list a{color:var(--accent);cursor:pointer}
-.kbd{font-size:.75rem;color:var(--muted);margin-top:14px}
-@media (max-width:560px){.actions .btn{flex:1 1 auto}.spacer{display:none}}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1517; --surface: #152022; --sunk: #1b292c; --line: #2b3d41;
+  --fg: #e3eef0; --muted: #94adb3; --accent: #4fc0cb; --accent-ink: #062a2e; --accent-soft: #163a3e;
+  --ok: #5fd08a; --ok-soft: #12321f; --bad: #ff8a7a; --bad-soft: #3a1714; --warn: #f2b45c; --warn-soft: #36270f;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e1517; --surface: #152022; --sunk: #1b292c; --line: #2b3d41;
+  --fg: #e3eef0; --muted: #94adb3; --accent: #4fc0cb; --accent-ink: #062a2e; --accent-soft: #163a3e;
+  --ok: #5fd08a; --ok-soft: #12321f; --bad: #ff8a7a; --bad-soft: #3a1714; --warn: #f2b45c; --warn-soft: #36270f;
+  color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 16px; padding-block: 0 48px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+code, pre { font-family: var(--f-mono); font-size: 0.86em; }
+code { background: var(--sunk); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--sunk); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 6px 0 0; white-space: pre-wrap; word-break: break-word; }
+a { color: var(--accent); }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 8px; padding: 9px 16px; font-weight: 600; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.ghost { background: transparent; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.spacer { flex: 1; }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+
+/* Barra superior */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar .in { max-width: 860px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.brand { font-family: var(--f-display); font-weight: 800; font-size: 17px; letter-spacing: -.01em; }
+.brand span { color: var(--accent); }
+.stat { font-family: var(--f-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.timer { font-family: var(--f-mono); font-weight: 600; font-variant-numeric: tabular-nums; padding: 3px 10px; border-radius: 999px; background: var(--sunk); }
+.timer.low { background: var(--bad-soft); color: var(--bad); }
+.progress { height: 4px; background: var(--sunk); }
+.progress i { display: block; height: 100%; background: var(--accent); transition: width .25s; }
+
+/* Início */
+.hero { padding-block: 28px 8px; }
+.hero h1 { font-size: clamp(28px, 6vw, 40px); letter-spacing: -.02em; }
+.hero p { color: var(--muted); max-width: 62ch; margin: 8px 0 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; margin-top: 18px; }
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.mode { border: 2px solid var(--line); border-radius: var(--r); padding: 14px; text-align: left; background: var(--surface); color: var(--fg); }
+.mode[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.mode b { font-family: var(--f-display); font-size: 17px; display: block; }
+.mode small { color: var(--muted); font-size: 14px; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+select { font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); width: 100%; }
+.check { display: flex; gap: 8px; align-items: center; }
+.domains { display: grid; gap: 8px; margin-top: 10px; }
+.dom { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; font-size: 15px; }
+.dom .tag { font-family: var(--f-mono); font-size: 12px; font-weight: 600; text-align: center; padding: 2px 0; border-radius: 6px; background: var(--sunk); }
+.meter { height: 6px; background: var(--sunk); border-radius: 999px; overflow: hidden; width: 120px; max-width: 30vw; }
+.meter i { display: block; height: 100%; background: var(--accent); }
+table.hist { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+table.hist th, table.hist td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+table.hist th { color: var(--muted); font-weight: 600; }
+.tbl { overflow-x: auto; }
+.pill { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.note { color: var(--muted); font-size: 14px; }
+
+/* Questão */
+.qcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; margin-top: 18px; }
+.qmeta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+.qtext { font-size: 17px; }
+.qhint { font-size: 14px; color: var(--warn); font-weight: 600; margin-top: 6px; }
+.opts { display: grid; gap: 8px; margin-top: 14px; }
+.opt { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: pointer; background: var(--surface); }
+.opt:hover { border-color: var(--accent); }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt .key { width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; font-family: var(--f-mono); font-weight: 600; font-size: 13px; background: var(--sunk); }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.opt.sel .key { background: var(--accent); color: var(--accent-ink); }
+.opt.right { border-color: var(--ok); background: var(--ok-soft); }
+.opt.right .key { background: var(--ok); color: var(--surface); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.opt.wrong .key { background: var(--bad); color: var(--surface); }
+.opt.locked { cursor: default; }
+.opt .body { min-width: 0; }
+.opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.verdict { margin-top: 16px; padding: 12px 14px; border-radius: 8px; font-weight: 700; font-family: var(--f-display); }
+.verdict.ok { background: var(--ok-soft); color: var(--ok); }
+.verdict.bad { background: var(--bad-soft); color: var(--bad); }
+.learn { margin-top: 12px; display: grid; gap: 12px; }
+.learn section { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; }
+.learn h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+.learn p { margin: 0; max-width: 70ch; }
+
+/* Tutor */
+.tutor { margin-top: 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--sunk); padding: 14px; }
+.tutor h3 { font-size: 16px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.chip { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.chip:hover { border-color: var(--accent); }
+.msgs { display: grid; gap: 8px; margin-top: 10px; }
+.msg { padding: 9px 12px; border-radius: 8px; white-space: pre-wrap; max-width: 100%; overflow-wrap: anywhere; }
+.msg.me { background: var(--accent-soft); justify-self: end; max-width: 85%; }
+.msg.ai { background: var(--surface); border: 1px solid var(--line); }
+.msg.err { color: var(--bad); background: var(--bad-soft); }
+.ask { display: flex; gap: 8px; margin-top: 10px; }
+.ask textarea { flex: 1; min-width: 0; font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); resize: vertical; min-height: 44px; }
+
+.nav { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; align-items: center; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; margin-top: 18px; }
+.cell { height: 36px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-family: var(--f-mono); font-size: 13px; position: relative; }
+.cell.ans { background: var(--accent-soft); border-color: var(--accent); }
+.cell.cur { outline: 2px solid var(--fg); outline-offset: 1px; }
+.cell.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.cell.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.cell.mk::after { content: ""; position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* Resultado */
+.score { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+.big { font-family: var(--f-display); font-size: 56px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.big small { font-size: 20px; color: var(--muted); font-weight: 600; }
+.review { margin-top: 12px; display: grid; gap: 10px; }
+details.rv { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+details.rv summary { cursor: pointer; display: flex; gap: 10px; align-items: baseline; }
+details.rv summary .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.confirm { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); }
+
+/* Telas simuladas */
+.screen { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-top: 14px; background: var(--surface); }
+.screen .cap { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); padding: 5px 10px; background: var(--sunk); border-bottom: 1px solid var(--line); }
+.screen .cap b { color: var(--fg); font-weight: 600; }
+.scr { padding: 12px; font-size: 14px; overflow-x: auto; display: grid; gap: 10px; }
+.scr table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+.scr th, .scr td { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: left; white-space: nowrap; }
+.scr th { color: var(--muted); font-weight: 600; background: var(--sunk); }
+.scr .kql { font-family: var(--f-mono); font-size: 13px; background: var(--sunk); border-radius: 6px; padding: 8px 10px; white-space: pre; overflow-x: auto; }
+.sgrid { display: grid; grid-template-columns: minmax(130px, auto) 1fr; gap: 4px 14px; font-size: 14px; }
+.sgrid span:nth-child(odd) { color: var(--muted); }
+.sbtns { display: flex; gap: 6px; flex-wrap: wrap; }
+.sbtn { border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; font-size: 13px; background: var(--surface); }
+.sbadge { display: inline-block; border-radius: 4px; padding: 0 7px; font-size: 12px; font-weight: 700; }
+.sbadge.r { background: var(--bad-soft); color: var(--bad); }
+.sbadge.g { background: var(--ok-soft); color: var(--ok); }
+.sbadge.y { background: var(--warn-soft); color: var(--warn); }
+.sbadge.n { background: var(--sunk); color: var(--muted); }
+
+/* Estudo de caso */
+details.case { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--sunk); padding: 10px 14px; }
+details.case summary { cursor: pointer; font-weight: 700; font-family: var(--f-display); }
+details.case .cbody { margin-top: 8px; font-size: 15px; display: grid; gap: 8px; }
+details.case .cbody p, details.case .cbody ul { margin: 0; }
+details.case .cbody ul { padding-left: 20px; }
+
+/* Sim / Não */
+.yn { width: 100%; border-collapse: collapse; margin-top: 14px; }
+.yn td, .yn th { border-bottom: 1px solid var(--line); padding: 8px; vertical-align: middle; }
+.yn th { font-size: 13px; color: var(--muted); text-align: center; }
+.yn th:first-child { text-align: left; }
+.yn td.c { text-align: center; width: 64px; }
+.yn input { width: 18px; height: 18px; accent-color: var(--accent); }
+.yn tr.right td:first-child { box-shadow: inset 3px 0 var(--ok); }
+.yn tr.wrong td:first-child { box-shadow: inset 3px 0 var(--bad); }
+.mark { font-family: var(--f-mono); font-weight: 700; font-size: 13px; }
+.mark.ok { color: var(--ok); } .mark.bad { color: var(--bad); }
+
+/* Hotspot */
+.hot { margin-top: 14px; line-height: 2.1; }
+.hot pre { line-height: 2; }
+select.hs { width: auto; max-width: 100%; display: inline-block; padding: 2px 6px; font-family: var(--f-mono); font-size: 13px; border: 1.5px solid var(--accent); background: var(--accent-soft); }
+.hsv { display: inline-block; padding: 0 6px; border-radius: 5px; font-family: var(--f-mono); font-size: 13px; line-height: 1.6; }
+.hsv.ok { background: var(--ok-soft); color: var(--ok); }
+.hsv.bad { background: var(--bad-soft); color: var(--bad); text-decoration: line-through; }
+
+/* Arrastar e soltar */
+.dd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px; margin-top: 14px; }
+.dd h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.pool { display: grid; gap: 6px; align-content: start; min-height: 60px; padding: 8px; border: 1px dashed var(--line); border-radius: 8px; }
+.dchip { border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 7px; padding: 7px 10px; text-align: left; cursor: grab; font-size: 15px; }
+.dchip.picked { border-color: var(--accent); background: var(--accent-soft); }
+.slots { display: grid; gap: 8px; }
+.slot { display: grid; gap: 4px; }
+.slot .lbl { font-size: 14px; font-weight: 600; }
+.drop { min-height: 40px; border: 1.5px dashed var(--line); border-radius: 7px; padding: 6px 10px; background: var(--sunk); color: var(--muted); text-align: left; font-size: 15px; width: 100%; }
+.drop.has { border-style: solid; border-color: var(--accent); background: var(--accent-soft); color: var(--fg); }
+.drop.over { border-color: var(--accent); }
+.drop.ok { border-style: solid; border-color: var(--ok); background: var(--ok-soft); color: var(--fg); }
+.drop.bad { border-style: solid; border-color: var(--bad); background: var(--bad-soft); color: var(--fg); }
+.drop .fix { display: block; font-size: 13px; color: var(--ok); font-weight: 600; }
+@media (max-width: 600px) { .dd { grid-template-columns: 1fr; } }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (max-width: 520px) { .qcard { padding: 14px; } .qtext { font-size: 16px; } .big { font-size: 44px; } }
 </style>
-</head>
-<body>
-<header>
-  <div class="brand">SC-200 <span>Treino</span></div>
-  <div class="counter" id="counter"></div>
-</header>
-<main>
-  <div class="card" id="card"></div>
-  <div class="card grid-wrap">
-    <div class="grid-head">
-      <h3>Questões</h3>
-      <div class="legend">
-        <span><i style="background:var(--ok)"></i>Acertou</span>
-        <span><i style="background:var(--bad)"></i>Errou</span>
-        <span><i style="background:var(--mark)"></i>Revisão</span>
-      </div>
-    </div>
-    <div class="grid" id="grid"></div>
-    <div class="actions">
-      <button class="btn small" id="btnFinish">Ver resultado</button>
-      <button class="btn small" id="btnReset">Reiniciar simulado</button>
-    </div>
+
+<header class="bar">
+  <div class="in">
+    <div class="brand">SC-200 <span>Treino</span></div>
+    <div class="spacer"></div>
+    <div class="stat" id="barStat"></div>
+    <div class="timer" id="timer" hidden></div>
   </div>
-</main>
+  <div class="progress"><i id="prog" style="width:0"></i></div>
+</header>
+
+<main class="wrap" id="app"></main>
 
 <script>
-/* d = domínio, q = pergunta, o = alternativas, a = índice correto,
-   e = 2 alternativas erradas eliminadas pela Dica 1, k = conceito-chave (Dica 2),
-   x = explicação, c = alternativas em formato de código */
-const D1="D1 · Configurar ambiente de SecOps", D2="D2 · Microsoft Sentinel", D3="D3 · Responder a incidentes", D4="D4 · Gerenciar ameaças (hunting e KQL)";
-const QUESTIONS=[
-{d:D4,c:1,q:"No advanced hunting, qual tabela lista as vulnerabilidades (CVEs) de software encontradas nos dispositivos?",o:["DeviceInfo","DeviceTvmSoftwareVulnerabilities","DeviceFileEvents","AlertEvidence"],a:1,e:[0,3],k:"Tabelas DeviceTvm* trazem inventário, vulnerabilidades e configurações seguras.",x:"DeviceTvmSoftwareVulnerabilities lista as CVEs por software instalado em cada dispositivo. DeviceInfo traz dados da máquina, DeviceFileEvents traz eventos de arquivo e AlertEvidence traz entidades de alertas."},
-{d:D4,c:1,q:"Qual tabela registra a criação de processos e suas linhas de comando nos endpoints?",o:["DeviceRegistryEvents","DeviceImageLoadEvents","DeviceProcessEvents","DeviceNetworkEvents"],a:2,e:[0,3],k:"Procure a tabela cujo nome descreve o tipo de evento: processo.",x:"DeviceProcessEvents contém a criação de processos, com ProcessCommandLine, processo pai e conta. DeviceImageLoadEvents registra carregamento de DLLs."},
-{d:D4,c:1,q:"Qual tabela contém os eventos de entrega e processamento de e-mails (remetente, destinatário, veredito)?",o:["EmailEvents","EmailUrlInfo","CloudAppEvents","DeviceEvents"],a:0,e:[2,3],k:"As tabelas Email* vêm do Defender for Office 365; uma é a principal, as outras complementam.",x:"EmailEvents é a tabela principal, com cada e-mail processado e o veredito de entrega. EmailUrlInfo e EmailAttachmentInfo trazem detalhes de URLs e anexos."},
-{d:D4,c:1,q:"Em KQL, qual função de agregação conta o número de valores DISTINTOS de uma coluna dentro de um summarize?",o:["count()","dcount()","countif()","sum()"],a:1,e:[2,3],k:"O 'd' vem de distinct.",x:"dcount() retorna a contagem aproximada de valores distintos. count() conta linhas e countif() conta linhas que atendem a uma condição."},
-{d:D4,c:1,q:"Qual operador KQL combina linhas de duas tabelas com base em uma coluna em comum (ex.: CveId)?",o:["union","extend","join","project"],a:2,e:[1,3],k:"Um operador une tabelas lado a lado, outro empilha linhas.",x:"join combina colunas de duas tabelas por chave. union apenas empilha as linhas das tabelas, sem correlacionar."},
-{d:D4,c:1,q:"Qual filtro retorna somente eventos das últimas 24 horas?",o:["where Timestamp > ago(1d)","where Timestamp > lookback(1d)","where Timestamp > datetime(1d)","where Timestamp > timespan(1d)"],a:0,e:[1,3],k:"Função que subtrai um intervalo do horário atual.",x:"ago(1d) retorna now() menos 1 dia. As demais opções não são funções válidas para esse uso."},
-{d:D4,q:"Ao criar uma regra de detecção personalizada a partir de uma query de advanced hunting, quais colunas a query precisa retornar?",o:["Somente DeviceName","Timestamp e ReportId, além de uma coluna de entidade (ex.: DeviceId)","AlertId e Severity","Nenhuma coluna específica é exigida"],a:1,e:[0,3],k:"A regra precisa identificar o evento exato e a entidade afetada.",x:"Detecções personalizadas exigem Timestamp, ReportId e ao menos uma coluna de identificador de entidade, como DeviceId, AccountObjectId ou RecipientEmailAddress."},
-{d:D4,q:"No Microsoft Sentinel, qual recurso executa uma query de hunting continuamente e notifica quando surgem novos resultados?",o:["Workbooks","Livestream","Watchlists","Bookmarks"],a:1,e:[0,2],k:"Pense em monitoramento interativo quase em tempo real.",x:"Livestream mantém uma sessão interativa que reexecuta a query e avisa sobre novos resultados, útil para validar hipóteses de hunting."},
-{d:D4,q:"Durante um hunting no Sentinel, você encontra linhas suspeitas e quer guardá-las para investigar depois e anexá-las a um incidente. O que usar?",o:["Bookmarks (indicadores)","Analytics rules","Data connectors","Content hub"],a:0,e:[2,3],k:"É como 'marcar uma página' dos resultados.",x:"Bookmarks salvam resultados de query com anotações e entidades mapeadas, e podem ser adicionados a incidentes."},
-{d:D4,q:"Você precisa procurar um IP em logs do Sentinel guardados em retenção de longo prazo (arquivados) de mais de um ano. Qual recurso é indicado?",o:["Livestream","Watchlist","Search job","Workbook"],a:2,e:[1,3],k:"Um trabalho assíncrono que varre grandes volumes e grava em uma nova tabela.",x:"Search jobs executam buscas assíncronas, inclusive em dados de retenção de longo prazo, e gravam os resultados em uma tabela _SRCH."},
-{d:D4,c:1,q:"Qual função KQL converte uma coluna string com conteúdo JSON em um objeto dinâmico para acessar seus campos?",o:["split()","parse_json()","tostring()","strcat()"],a:1,e:[0,3],k:"O nome da função diz o formato que ela interpreta.",x:"parse_json() (ou todynamic()) converte texto JSON em dynamic, permitindo acessar campos como obj.campo."},
-{d:D4,c:1,q:"Qual tabela mostra as conexões de rede feitas pelos processos nos endpoints (IP remoto, porta, URL)?",o:["DeviceNetworkInfo","DeviceNetworkEvents","DeviceLogonEvents","IdentityQueryEvents"],a:1,e:[2,3],k:"Uma tabela traz configuração de adaptadores; a outra traz eventos.",x:"DeviceNetworkEvents registra conexões e eventos de rede. DeviceNetworkInfo traz a configuração dos adaptadores (IP, MAC, rede)."},
-{d:D4,c:1,q:"Qual tabela do Defender for Identity registra consultas feitas a objetos do Active Directory, como enumeração LDAP?",o:["IdentityLogonEvents","IdentityDirectoryEvents","IdentityQueryEvents","DeviceEvents"],a:2,e:[0,3],k:"Reconhecimento (recon) gera consultas.",x:"IdentityQueryEvents contém consultas LDAP, DNS e SAMR feitas contra o AD. IdentityDirectoryEvents traz alterações em objetos do diretório."},
-{d:D4,c:1,q:"Qual operador KQL exibe o resultado como gráfico de linha ao longo do tempo?",o:["render timechart","project timechart","summarize chart","make-series render"],a:0,e:[1,2],k:"O operador de visualização em KQL é 'render'.",x:"render timechart desenha uma série temporal, geralmente após summarize count() by bin(Timestamp, 1h)."},
+const DOM = {
+  1: "Gerenciar o ambiente de operações de segurança",
+  2: "Configurar proteções e detecções",
+  3: "Gerenciar a resposta a incidentes",
+  4: "Gerenciar ameaças (hunting e KQL)"
+};
 
-{d:D3,q:"Um dispositivo está comprometido. Você quer cortar a comunicação de rede dele, mas mantê-lo conectado ao serviço do Defender para continuar investigando. Qual ação usar?",o:["Restringir execução de aplicativos","Isolar dispositivo","Executar verificação antivírus","Coletar pacote de investigação"],a:1,e:[2,3],k:"A ação 'corta o cabo', exceto para o Defender.",x:"Isolar dispositivo bloqueia a rede, mantendo apenas a conexão com o Defender for Endpoint. Isolamento seletivo pode permitir Outlook/Teams."},
-{d:D3,q:"Qual ação de resposta no Defender for Endpoint permite que apenas executáveis assinados pela Microsoft rodem no dispositivo?",o:["Isolar dispositivo","Restringir execução de aplicativos","Proteção contra adulteração","Live response"],a:1,e:[2,3],k:"A ação usa uma política de controle de aplicativos.",x:"Restringir execução de aplicativos aplica uma política que só permite arquivos assinados pela Microsoft."},
-{d:D3,q:"Você precisa executar um script PowerShell e baixar um arquivo de um dispositivo remotamente, pelo portal. Qual recurso usar?",o:["Live response","Automated investigation","Device groups","Threat analytics"],a:0,e:[2,3],k:"É um shell remoto pelo portal.",x:"Live response abre uma sessão remota no dispositivo para executar comandos, scripts da biblioteca e coletar ou enviar arquivos."},
-{d:D3,q:"Uma investigação automatizada (AIR) gerou ações de correção pendentes de aprovação. Onde você aprova essas ações no Defender XDR?",o:["Central de ações (Action center)","Explorador de ameaças","Secure Score","Content hub"],a:0,e:[2,3],k:"Um lugar centralizado para ações pendentes e histórico.",x:"A Central de ações reúne as ações pendentes e concluídas das investigações automatizadas de endpoints e e-mail."},
-{d:D3,q:"Um e-mail malicioso já foi entregue a 300 caixas. Qual ferramenta do Defender for Office 365 permite localizar e remover essas mensagens manualmente?",o:["Explorador de ameaças (Threat Explorer)","Políticas anti-spam","Simulação de ataque","Message trace do Exchange"],a:0,e:[1,2],k:"Uma ferramenta de caça e correção em e-mails.",x:"No Threat Explorer você filtra as mensagens e usa 'Tomar ação' (exclusão reversível, mover para lixo eletrônico etc.). O ZAP também remove mensagens automaticamente após a entrega."},
-{d:D3,q:"Você quer bloquear a execução de um arquivo, pelo hash SHA-256, em todos os dispositivos da organização. O que configurar?",o:["Indicador de arquivo com ação 'Bloquear e corrigir'","Regra de ASR","Grupo de dispositivos","Exclusão do antivírus"],a:0,e:[2,3],k:"IoCs personalizados no Defender for Endpoint.",x:"Indicadores (IoCs) de arquivo permitem permitir, alertar ou bloquear e corrigir arquivos por hash em toda a organização."},
-{d:D3,q:"No Defender for Cloud Apps, um app OAuth malicioso recebeu permissões dos usuários. Qual ação impede seu uso por todos?",o:["Marcar o app como Proibido (Banned)","Criar uma watchlist","Habilitar o Secure Score","Marcar como Sancionado"],a:0,e:[1,2],k:"Ação de governança em app OAuth.",x:"Proibir o app OAuth revoga as permissões concedidas e impede novos consentimentos."},
-{d:D3,q:"No Microsoft Entra ID Protection, você confirmou que uma conta foi comprometida. Qual ação eleva o risco do usuário a alto?",o:["Confirmar usuário comprometido","Ignorar risco do usuário","Confirmar entrada segura","Excluir o usuário"],a:0,e:[1,2],k:"Dar feedback ao ID Protection sobre o usuário.",x:"'Confirmar usuário comprometido' define o risco como alto, fazendo políticas de acesso condicional baseadas em risco atuarem."},
-{d:D3,q:"Onde o analista vê a linha do tempo, os alertas correlacionados e o gráfico de entidades de um incidente no Defender XDR?",o:["Página do incidente, aba Ataque / História do ataque","Secure Score","Relatórios de e-mail","Configurações > Endpoints"],a:0,e:[1,3],k:"O incidente reúne a história do ataque.",x:"A página do incidente mostra a história do ataque com alertas, entidades, evidências e investigações automatizadas correlacionadas."},
-{d:D3,q:"Um alerta do Microsoft Defender for Cloud em uma VM deve disparar automaticamente um fluxo que avisa no Teams. O que configurar?",o:["Automação de fluxo de trabalho com Logic Apps","Regra de ASR","Device group","Watchlist"],a:0,e:[1,2],k:"No Defender for Cloud, a automação usa Logic Apps.",x:"Workflow automation do Defender for Cloud dispara Logic Apps a partir de alertas, recomendações ou conformidade."},
-{d:D3,q:"Você precisa coletar evidências forenses (processos, tarefas agendadas, logs) de um dispositivo em um arquivo .zip. Qual ação usar?",o:["Coletar pacote de investigação","Isolar dispositivo","Executar verificação antivírus","Iniciar investigação automatizada"],a:0,e:[1,2],k:"O nome da ação diz que ela coleta um pacote.",x:"'Coletar pacote de investigação' gera um zip com informações forenses do dispositivo para análise offline."},
-{d:D3,q:"Alertas do Microsoft Purview DLP sobre vazamento de dados podem ser investigados junto com outros incidentes em qual portal?",o:["Portal do Microsoft Defender (Defender XDR)","Portal do Azure DevOps","Centro de administração do Teams","Intune"],a:0,e:[1,2],k:"O portal unificado de SecOps.",x:"Alertas de DLP do Purview são integrados ao Defender XDR e correlacionados em incidentes com outros sinais."},
+// d = domínio, q = enunciado, o = alternativas, a = índices corretos, e = por que, c = conceito-chave, k = termo para busca no Microsoft Learn
+const Q = [
+{d:1,q:"Um analista do SOC precisa atribuir, alterar o status e fechar incidentes no Microsoft Sentinel, mas <b>não</b> deve conseguir criar ou editar regras de análise. Seguindo o menor privilégio, qual função atribuir?",o:["Microsoft Sentinel Reader","Microsoft Sentinel Responder","Microsoft Sentinel Contributor","Microsoft Sentinel Automation Contributor"],a:[1],e:"O Responder gerencia incidentes (atribuir, mudar status, fechar). Reader só lê; Contributor também cria e edita regras e conteúdo; Automation Contributor é para a conta de serviço do Sentinel executar playbooks.",c:"As funções do Sentinel crescem em camadas: Reader (ver) → Responder (ver + gerenciar incidentes) → Contributor (tudo isso + criar conteúdo).",k:"Microsoft Sentinel funções permissões"},
+{d:1,q:"Sua empresa quer investigar incidentes do Microsoft Sentinel e do Microsoft Defender XDR em uma única fila de incidentes. Onde isso é feito?",o:["No portal do Azure, em Log Analytics","No portal do Microsoft Defender (plataforma unificada de operações de segurança)","No portal do Microsoft Purview","No centro de administração do Microsoft Entra"],a:[1],e:"Ao conectar o workspace do Sentinel ao portal do Defender, os incidentes do Sentinel e do XDR passam a ser correlacionados e exibidos na mesma fila.",c:"A plataforma unificada de SecOps junta SIEM (Sentinel) e XDR (Defender) em um só portal: security.microsoft.com.",k:"Microsoft Sentinel portal do Defender plataforma unificada"},
+{d:1,q:"Você configurou o conector <i>Windows Security Events via AMA</i>. Qual objeto define <b>quais eventos</b> são coletados dos servidores e para qual workspace vão?",o:["Uma regra de coleta de dados (Data Collection Rule — DCR)","Uma GPO de auditoria","Um workbook do Sentinel","Uma regra de automação"],a:[0],e:"Com o Azure Monitor Agent, a DCR define as fontes e os filtros (eventos coletados, inclusive por XPath) e o destino (workspace). As outras opções não controlam a coleta do agente.",c:"AMA + DCR é o modelo atual de coleta. O agente legado (MMA/Log Analytics agent) foi descontinuado.",k:"Data Collection Rule Azure Monitor Agent Sentinel"},
+{d:1,q:"Um firewall de terceiros só envia logs no formato <b>CEF</b> via Syslog. Qual é a abordagem recomendada para ingerir esses logs no Sentinel?",o:["Instalar o agente do Defender for Endpoint no firewall","Usar o conector <i>Common Event Format (CEF) via AMA</i> com um encaminhador Linux que executa o Azure Monitor Agent","Usar o conector <i>Windows Forwarded Events</i>","Exportar os logs para um Storage Account e usar o conector do Azure Storage"],a:[1],e:"Appliances não aceitam agentes. Eles enviam Syslog/CEF para um encaminhador Linux com AMA, e o conector \"CEF via AMA\" grava os dados na tabela CommonSecurityLog.",c:"CEF e Syslog chegam por um encaminhador Linux. CEF vai para CommonSecurityLog; Syslog puro vai para a tabela Syslog.",k:"CEF via AMA Microsoft Sentinel"},
+{d:1,q:"Você precisa ingerir logs de depuração de alto volume, consultados raramente, com o <b>menor custo</b> possível. Qual plano de tabela usar?",o:["Analytics","Basic","Commitment tier de 100 GB/dia","Cluster dedicado"],a:[1],e:"O plano Basic tem ingestão mais barata, com KQL limitado e retenção interativa curta. Commitment tier e cluster dedicado são formas de desconto por volume, não planos de tabela.",c:"Planos de tabela: Analytics (completo, usado por regras de detecção) e Basic/Auxiliary (barato, para logs volumosos e pouco consultados).",k:"Log Analytics planos de tabela Basic logs"},
+{d:1,q:"Você quer que todas as novas VMs do Azure de uma assinatura sejam integradas automaticamente ao Microsoft Defender for Endpoint. O que fazer?",o:["Criar uma GPO com o pacote de integração","Habilitar o plano Defender for Servers no Microsoft Defender for Cloud","Instalar o Microsoft Monitoring Agent manualmente em cada VM","Criar uma regra de análise no Sentinel"],a:[1],e:"O Defender for Servers inclui a integração com o MDE e implanta o sensor automaticamente nas máquinas cobertas pela assinatura.",c:"Defender for Cloud protege cargas de nuvem; para servidores, ele usa o próprio Defender for Endpoint como sensor.",k:"Defender for Servers integração Defender for Endpoint"},
+{d:1,q:"A equipe de suporte do Brasil deve ver e agir <b>somente</b> sobre os dispositivos do Brasil no Defender for Endpoint. O que configurar?",o:["Uma unidade administrativa no Entra ID","Um grupo de dispositivos associado a uma função personalizada (RBAC)","Uma tag de alerta","Uma política de Conditional Access"],a:[1],e:"No MDE, os grupos de dispositivos definem quais equipes (grupos do Entra associados a funções) enxergam quais máquinas. Também definem o nível de automação.",c:"Device groups = escopo de acesso e de automação no Defender for Endpoint.",k:"Defender for Endpoint grupos de dispositivos RBAC"},
+{d:1,q:"Para servidores críticos, <b>qualquer</b> remediação automática da investigação automatizada (AIR) deve ser aprovada por um analista. Qual nível de automação aplicar ao grupo desses servidores?",o:["Full — remediate threats automatically","Semi — require approval for any remediation","Semi — require approval for non-temp folders remediation","No automated response"],a:[1],e:"\"Semi — require approval for any remediation\" exige aprovação para todas as ações. As demais opções \"Semi\" só exigem para algumas pastas; \"No automated response\" desliga a AIR.",c:"A AIR investiga sozinha. O nível de automação define se ela remedia sozinha (Full) ou se espera aprovação no Action center (Semi).",k:"Defender for Endpoint níveis de automação investigação automatizada"},
+{d:1,q:"Você precisa detectar ameaças como injeção de SQL e acessos anômalos nos bancos Azure SQL Database. O que habilitar?",o:["O plano Defender for Databases (Azure SQL) no Defender for Cloud","O Defender for Storage","O conector Azure Activity no Sentinel","O Defender for App Service"],a:[0],e:"O plano para Azure SQL (dentro do Defender for Databases) gera alertas de injeção de SQL, acessos de locais incomuns e força bruta.",c:"Cada tipo de recurso tem seu plano no Defender for Cloud: Servers, Storage, Databases, Containers, App Service, Key Vault etc.",k:"Defender for Azure SQL alertas"},
+{d:1,q:"Sua organização também usa AWS. Como fazer o Defender for Cloud avaliar a postura e proteger recursos da AWS?",o:["Instalar o Defender for Cloud Apps na AWS","Adicionar um conector AWS em <i>Environment settings</i> no Defender for Cloud","Criar um workspace do Log Analytics na região da AWS","Não é suportado"],a:[1],e:"O Defender for Cloud é multicloud. Os conectores para AWS e GCP ficam em Environment settings.",c:"CSPM (postura) + CWP (proteção de cargas) para Azure, AWS e GCP no mesmo painel.",k:"Defender for Cloud conectar AWS"},
+{d:1,q:"Você quer bloquear um IP malicioso em todos os dispositivos usando indicadores do Defender for Endpoint. Quais pré-requisitos são necessários? <b>(Escolha duas)</b>",o:["Habilitar o recurso avançado <i>Custom network indicators</i>","Habilitar a proteção de rede (network protection) no modo bloqueio","Habilitar o modo de auditoria das regras ASR","Habilitar o Defender for Cloud Apps"],a:[0,1],e:"Indicadores de IP, URL e domínio dependem do recurso avançado \"Custom network indicators\" e da Network Protection em modo bloqueio. As outras opções não são necessárias.",c:"Indicadores de arquivo (hash) e de certificado não dependem da Network Protection; os de rede dependem.",k:"Defender for Endpoint indicadores IP URL"},
+{d:1,q:"Antes de aplicar regras de redução da superfície de ataque (ASR) em produção, você quer medir o impacto sem bloquear nada. Qual modo usar?",o:["Block","Warn","Audit","Disabled"],a:[2],e:"O modo Audit registra o que seria bloqueado, sem bloquear. Warn bloqueia, mas deixa o usuário prosseguir.",c:"Boa prática: Audit → analisar eventos → exclusões → Block.",k:"regras de redução da superfície de ataque modo auditoria"},
+{d:1,q:"Você quer instalar de uma vez o conector, as regras de análise, os workbooks e as consultas de hunting de um produto de terceiros no Sentinel. Onde fazer isso?",o:["Content hub","Threat intelligence","Watchlists","Notebooks"],a:[0],e:"As soluções do Content hub empacotam conectores, regras, workbooks, consultas de hunting e playbooks.",c:"Content hub = loja de soluções do Sentinel (da Microsoft e da comunidade).",k:"Microsoft Sentinel Content hub soluções"},
+{d:1,q:"Você criou uma watchlist com o alias <code>VIPUsers</code>. Como referenciá-la em KQL?",o:["<code>Watchlist(\"VIPUsers\")</code>","<code>_GetWatchlist('VIPUsers')</code>","<code>externaldata(VIPUsers)</code>","<code>lookup VIPUsers</code>"],a:[1],e:"<code>_GetWatchlist('alias')</code> retorna os itens da watchlist como tabela, com a coluna <code>SearchKey</code> para joins rápidos.",c:"Watchlists guardam listas de referência (VIPs, IPs permitidos, ativos críticos) para enriquecer regras e hunting.",k:"Microsoft Sentinel watchlists _GetWatchlist"},
+{d:1,q:"Um alerta do Defender XDR é gerado repetidamente por uma ferramenta administrativa legítima. Você quer ocultar esses alertas benignos automaticamente, só nessa condição específica. O que usar?",o:["Alert tuning (regra de ajuste de alertas)","Excluir o dispositivo do Defender for Endpoint","Desabilitar a detecção no Defender Antivirus","Classificar manualmente cada alerta como falso positivo"],a:[0],e:"Alert tuning (antes chamado de regras de supressão) oculta ou resolve automaticamente os alertas que atendem às condições definidas, sem desligar a proteção.",c:"Reduzir ruído sem perder visibilidade: ajuste fino com condições, e não exclusões amplas.",k:"Defender XDR alert tuning"},
 
-{d:D2,q:"Você precisa coletar eventos de Segurança do Windows de VMs para o Sentinel usando o agente atual recomendado. Qual conector usar?",o:["Windows Security Events via AMA","Log Analytics agent (MMA)","Syslog via AMA","Common Event Format (CEF)"],a:0,e:[2,3],k:"O agente legado foi descontinuado; o atual é o Azure Monitor Agent.",x:"O conector 'Windows Security Events via AMA' usa o Azure Monitor Agent e Data Collection Rules. O agente MMA foi aposentado."},
-{d:D2,q:"Um firewall envia logs em formato CEF. Como ingerir esses dados no Sentinel?",o:["Por um forwarder Linux com o conector CEF via AMA","Instalando o AMA no próprio firewall","Com um conector do Microsoft 365","Por uma watchlist"],a:0,e:[2,3],k:"Appliances geralmente não aceitam agentes; os logs passam por um servidor intermediário.",x:"Appliances enviam CEF/Syslog a um forwarder Linux com AMA, que envia para a tabela CommonSecurityLog."},
-{d:D2,q:"Qual tipo de regra de análise usa machine learning para correlacionar alertas de baixa fidelidade e detectar ataques de vários estágios?",o:["Scheduled","Fusion","NRT","Microsoft Security"],a:1,e:[0,2],k:"O nome sugere 'fusão' de sinais.",x:"A regra Fusion (detecção avançada de ataques em vários estágios) usa ML para correlacionar sinais de vários produtos."},
-{d:D2,q:"Qual tipo de regra de análise executa a cada minuto, para detecção quase em tempo real?",o:["Scheduled","Fusion","NRT (Near-real-time)","Anomaly"],a:2,e:[1,3],k:"O nome é a sigla de 'quase tempo real'.",x:"Regras NRT executam a cada minuto com atraso mínimo. Regras Scheduled têm frequência mínima de 5 minutos."},
-{d:D2,q:"Você precisa de uma resposta complexa ao incidente: enviar uma mensagem no Teams, consultar uma API externa e desabilitar o usuário no Entra ID. O que usar?",o:["Playbook (Logic Apps)","Regra de automação sozinha","Workbook","Watchlist"],a:0,e:[2,3],k:"Ações em sistemas externos exigem orquestração.",x:"Playbooks são Logic Apps que executam fluxos com conectores. Regras de automação disparam playbooks e fazem ações simples."},
-{d:D2,q:"Sem usar Logic Apps, você quer atribuir um dono, mudar a severidade e adicionar uma tag automaticamente quando um incidente é criado. O que usar?",o:["Regra de automação","Playbook","Fusion","Workbook"],a:0,e:[2,3],k:"Ações simples sobre o incidente, nativas do Sentinel.",x:"Regras de automação podem atribuir dono, alterar status e severidade, adicionar tags e executar playbooks."},
-{d:D2,c:1,q:"Você importou para uma watchlist uma lista de contas VIP com alias 'VIPs'. Como consultá-la em KQL?",o:["_GetWatchlist('VIPs')","Watchlist('VIPs')","externaldata('VIPs')","lookup VIPs"],a:0,e:[2,3],k:"Uma função com underscore no início.",x:"_GetWatchlist('alias') retorna os itens da watchlist para uso com join ou in."},
-{d:D2,q:"Qual recurso do Sentinel cria painéis interativos para visualizar e monitorar os dados?",o:["Workbooks","Bookmarks","Notebooks","Watchlists"],a:0,e:[1,3],k:"Baseado no Azure Monitor Workbooks.",x:"Workbooks são painéis interativos com queries, gráficos e parâmetros. Notebooks (Jupyter) servem para hunting avançado com Python."},
-{d:D2,q:"Qual recurso do Sentinel cria perfis de comportamento de usuários e hosts para detectar atividades anômalas?",o:["UEBA","ASIM","Livestream","Content hub"],a:0,e:[2,3],k:"User and Entity Behavior Analytics.",x:"O UEBA analisa o comportamento de usuários e entidades e grava os resultados em tabelas como BehaviorAnalytics."},
-{d:D2,q:"Onde você instala soluções empacotadas (conectores, regras, workbooks, playbooks) no Sentinel?",o:["Content hub","Data connectors","Configurações do workspace","Marketplace do Azure DevOps"],a:0,e:[2,3],k:"O hub central de conteúdo.",x:"O Content hub reúne soluções e conteúdos autônomos para instalar e gerenciar."},
-{d:D2,q:"Um analista precisa gerenciar incidentes (atribuir, mudar status) sem poder criar ou editar regras de análise. Qual função atribuir, com privilégio mínimo?",o:["Microsoft Sentinel Responder","Microsoft Sentinel Reader","Microsoft Sentinel Contributor","Owner"],a:0,e:[2,3],k:"Ler é pouco; Contributor é demais.",x:"Responder permite ler os dados e gerenciar incidentes. Reader só lê, e Contributor também cria e edita conteúdo."},
-{d:D2,q:"Você quer que uma única query detecte atividade suspeita em logs DNS de fornecedores diferentes. Qual recurso do Sentinel ajuda?",o:["ASIM (Advanced Security Information Model)","Livestream","Bookmarks","Fusion"],a:0,e:[1,2],k:"Normalização de dados com parsers.",x:"O ASIM normaliza dados de várias fontes em um esquema comum, com parsers como _Im_Dns, permitindo queries independentes da fonte."},
-{d:D2,q:"Em uma regra de análise agendada, como garantir que IPs e contas apareçam como entidades no incidente?",o:["Configurando o mapeamento de entidades","Criando uma watchlist","Usando render","Ativando o UEBA apenas"],a:0,e:[2,3],k:"Associar colunas da query a tipos de entidade.",x:"O mapeamento de entidades associa colunas da query a tipos como Account, IP e Host, alimentando o gráfico de investigação e o UEBA."},
-{d:D2,q:"Uma regra agendada gera muitos incidentes repetidos para o mesmo usuário. Como juntá-los em um único incidente?",o:["Configurar o agrupamento de alertas na regra","Reduzir a severidade","Desativar a regra","Criar um bookmark"],a:0,e:[2,3],k:"Configurações de incidente da própria regra.",x:"Na aba de configurações de incidente da regra, o agrupamento de alertas junta os alertas de uma janela de tempo por entidades correspondentes em um só incidente."},
+{d:2,q:"Você precisa de uma regra de análise no Sentinel que gere alertas com o <b>menor atraso possível</b> (execução a cada minuto). Que tipo de regra criar?",o:["Scheduled","Near-real-time (NRT)","Anomaly","Microsoft Security"],a:[1],e:"Regras NRT rodam a cada minuto, com latência mínima. As Scheduled têm intervalo mínimo de 5 minutos.",c:"Tipos de regra: Scheduled, NRT, Fusion, Anomaly (ML), Microsoft Security (cria incidentes de alertas de outros produtos) e Threat Intelligence.",k:"Microsoft Sentinel regras NRT"},
+{d:2,q:"Por que configurar o <b>mapeamento de entidades</b> (contas, hosts, IPs) em uma regra de análise agendada?",o:["Para reduzir o custo de ingestão","Para permitir correlação, enriquecimento (UEBA) e o gráfico de investigação","Para a regra rodar mais rápido","Para exportar o alerta para o Defender for Cloud"],a:[1],e:"Entidades mapeadas permitem correlacionar alertas e incidentes, enriquecer com UEBA e navegar pelo gráfico de investigação.",c:"Sem entidades, o alerta é só texto. Com elas, o Sentinel entende quem e o quê está envolvido.",k:"Microsoft Sentinel mapeamento de entidades"},
+{d:2,q:"Qual mecanismo do Sentinel usa machine learning para correlacionar alertas de baixa fidelidade e detectar <b>ataques em vários estágios</b>?",o:["Fusion (Advanced multistage attack detection)","Regras NRT","Watchlists","ASIM"],a:[0],e:"O Fusion correlaciona sinais de vários produtos com ML para identificar cadeias de ataque.",c:"Fusion vem habilitado por padrão e não precisa de KQL.",k:"Microsoft Sentinel Fusion detecção multiestágio"},
+{d:2,q:"Você habilitou o conector do Defender XDR no Sentinel com sincronização de incidentes. O que é recomendado fazer com as regras <i>Microsoft Security</i> (criação de incidentes) desses produtos?",o:["Mantê-las ativas para redundância","Desativá-las, para evitar incidentes duplicados","Convertê-las em regras NRT","Aumentar a severidade delas"],a:[1],e:"Com a integração de incidentes do XDR, a Microsoft recomenda desativar essas regras. Senão, o mesmo alerta gera dois incidentes.",c:"O conector Defender XDR traz incidentes já correlacionados, sincronizados nos dois sentidos.",k:"conector Microsoft Defender XDR Sentinel incidentes"},
+{d:2,q:"Você está criando uma regra de detecção personalizada a partir do advanced hunting do Defender XDR. Quais colunas a consulta precisa retornar?",o:["Somente <code>Timestamp</code>","<code>Timestamp</code>, <code>ReportId</code> e uma coluna identificadora de entidade, como <code>DeviceId</code>","<code>TimeGenerated</code> e <code>Computer</code>","Qualquer coluna, desde que haja um <code>summarize</code>"],a:[1],e:"Detecções personalizadas exigem <code>Timestamp</code>, <code>ReportId</code> e ao menos uma coluna de entidade (DeviceId, AccountObjectId, RecipientEmailAddress…) para gerar o alerta e permitir ações.",c:"Custom detections = consultas KQL agendadas no XDR, que geram alertas e podem disparar ações automáticas.",k:"Defender XDR detecções personalizadas colunas obrigatórias"},
+{d:2,q:"Uma regra agendada gera dezenas de alertas por hora para o mesmo usuário, e cada um vira um incidente separado. Como reduzir o volume de incidentes sem perder os alertas?",o:["Desativar a regra","Habilitar o agrupamento de alertas (alert grouping) na configuração de incidentes da regra","Aumentar o período de lookback","Mudar a severidade para Informational"],a:[1],e:"O alert grouping junta alertas relacionados (por exemplo, pelas mesmas entidades) em um incidente, dentro de uma janela de tempo.",c:"Alertas ≠ incidentes: o incidente é o agrupamento que o analista trabalha.",k:"Microsoft Sentinel agrupamento de alertas regra"},
+{d:2,q:"Você quer uma única consulta de detecção que funcione para logs de rede de vários fornecedores de firewall. O que usar?",o:["Parsers ASIM, como <code>_Im_NetworkSession</code>","Uma watchlist por fornecedor","A função <code>externaldata</code>","Um workbook"],a:[0],e:"O ASIM normaliza dados de fontes diferentes em um esquema comum; os parsers <code>_Im_*</code> permitem consultas independentes do fornecedor.",c:"ASIM = Advanced Security Information Model: esquemas de Network Session, DNS, Authentication, Process Event etc.",k:"ASIM Advanced Security Information Model"},
+{d:2,q:"Um parceiro compartilha indicadores de ameaça por meio de um servidor <b>TAXII 2.x</b>. Como ingeri-los no Sentinel?",o:["Conector Threat Intelligence — TAXII","Conector Syslog","Watchlist com upload manual diário","Conector Azure Activity"],a:[0],e:"O conector TAXII consome coleções STIX/TAXII 2.x e grava os indicadores nas tabelas de threat intelligence.",c:"STIX é o formato do indicador; TAXII é o protocolo de transporte.",k:"Microsoft Sentinel conector TAXII"},
+{d:2,q:"Sempre que o Defender for Cloud gerar um alerta de severidade alta, você quer acionar um Logic App que abre um chamado no ServiceNow. O que configurar?",o:["Workflow automation","Continuous export","Regulatory compliance","Secure score"],a:[0],e:"Workflow automation aciona Logic Apps a partir de alertas, recomendações ou mudanças de conformidade. Continuous export só envia os dados para outro destino.",c:"No Defender for Cloud: automação = Logic App; exportação = Event Hub ou Log Analytics.",k:"Defender for Cloud workflow automation"},
+{d:2,q:"Usuários em dispositivos não gerenciados podem acessar o SharePoint Online, mas não devem conseguir <b>baixar</b> arquivos. O que configurar?",o:["Uma política de sessão do Defender for Cloud Apps com Conditional Access App Control","Uma regra ASR","Uma política anti-phishing","Um indicador de URL no Defender for Endpoint"],a:[0],e:"O Conditional Access App Control encaminha a sessão pelo Defender for Cloud Apps, e uma política de sessão bloqueia o download em tempo real.",c:"Defender for Cloud Apps = CASB: descoberta de shadow IT, políticas de atividade e controle de sessão.",k:"Defender for Cloud Apps política de sessão bloquear download"},
+{d:2,q:"Onde o sensor do Microsoft Defender for Identity deve ser instalado? <b>(Escolha duas)</b>",o:["Em controladores de domínio","Em servidores AD FS","Em todas as estações de trabalho","No Exchange Online"],a:[0,1],e:"O sensor do MDI vai em controladores de domínio e também em servidores AD FS, AD CS e Entra Connect. Não vai em estações de trabalho.",c:"O MDI observa o tráfego e os eventos do AD local para detectar ataques como pass-the-hash, DCSync e Kerberoasting.",k:"Defender for Identity sensor instalação"},
+{d:2,q:"Você quer que anexos de e-mail desconhecidos sejam abertos em um ambiente isolado (sandbox) antes de serem entregues. Qual política do Defender for Office 365 configurar?",o:["Safe Links","Safe Attachments","Anti-spam","Anti-phishing com proteção contra representação"],a:[1],e:"Safe Attachments detona anexos em sandbox antes da entrega. Safe Links verifica URLs no momento do clique.",c:"MDO: Safe Attachments (arquivos), Safe Links (URLs), Anti-phishing (representação/spoofing), ZAP (remoção após a entrega).",k:"Defender for Office 365 Safe Attachments"},
 
-{d:D1,q:"Você quer impedir que aplicativos do Office criem processos filhos, um comportamento comum em macros maliciosas. O que configurar?",o:["Regras de redução da superfície de ataque (ASR)","Indicadores de URL","Isolamento de dispositivo","Retenção de dados"],a:0,e:[1,2],k:"Regras que reduzem comportamentos explorados por malware.",x:"As regras de ASR bloqueiam comportamentos como 'Bloquear aplicativos do Office de criar processos filho'."},
-{d:D1,q:"No Defender for Endpoint, como limitar uma equipe de analistas a ver apenas os dispositivos de uma filial?",o:["Grupos de dispositivos com atribuição de grupos de usuários","Regras de ASR","Indicadores","Secure Score"],a:0,e:[1,2],k:"Escopo de acesso por conjunto de máquinas.",x:"Grupos de dispositivos (ou o escopo do RBAC unificado) definem quais dispositivos cada grupo de usuários pode ver, e também o nível de automação."},
-{d:D1,q:"Onde se define o nível de automação da correção (ex.: 'Completo – corrigir ameaças automaticamente') no Defender for Endpoint?",o:["Nas configurações dos grupos de dispositivos","Nas regras de automação do Sentinel","No Secure Score","Nas políticas anti-phishing"],a:0,e:[2,3],k:"É configurado por conjunto de dispositivos.",x:"O nível de automação do AIR é definido por grupo de dispositivos, variando de 'Sem resposta automatizada' a 'Completo'."},
-{d:D1,q:"Qual recurso impede que um malware ou atacante desative o Microsoft Defender Antivirus e a proteção em tempo real?",o:["Proteção contra adulteração (Tamper protection)","Proteção de rede","Controlled folder access","Live response"],a:0,e:[1,3],k:"Protege as configurações do próprio Defender.",x:"A proteção contra adulteração bloqueia alterações não autorizadas em configurações de segurança, como desativar a proteção em tempo real."},
-{d:D1,q:"Para o Microsoft Defender for Identity monitorar o Active Directory local, onde o sensor deve ser instalado?",o:["Nos controladores de domínio (e AD FS/AD CS, se houver)","Em todas as estações de trabalho","Somente no Entra Connect","Em um gateway na nuvem do Azure"],a:0,e:[1,3],k:"O sensor precisa ver o tráfego e os eventos de autenticação.",x:"O sensor do MDI é instalado diretamente nos DCs, além dos servidores AD FS, AD CS e Entra Connect, para capturar tráfego e eventos."},
-{d:D1,q:"No Microsoft Defender for Cloud, qual plano oferece proteção avançada de VMs com integração ao Defender for Endpoint?",o:["Defender for Servers","Defender for Storage","Defender CSPM","Defender for DNS"],a:0,e:[1,3],k:"Workload protection para servidores.",x:"O Defender for Servers (Plano 1 ou 2) habilita EDR via MDE, avaliação de vulnerabilidades e outros recursos para VMs e servidores."}
+{d:3,q:"Um notebook está comprometido. Você precisa cortar a comunicação dele com a rede, mas continuar investigando pelo Defender for Endpoint. Qual ação usar?",o:["Isolate device","Restrict app execution","Run antivirus scan","Desligar o dispositivo remotamente"],a:[0],e:"O isolamento corta a rede, mas mantém a conexão com o serviço do Defender, o que permite continuar investigando e usar live response.",c:"O isolamento pode ser total ou seletivo (permitindo Outlook e Teams).",k:"Defender for Endpoint isolar dispositivo"},
+{d:3,q:"Em uma sessão de <i>live response</i>, qual comando copia um arquivo suspeito do dispositivo para análise?",o:["<code>getfile</code>","<code>run</code>","<code>collect</code>","<code>remediate</code>"],a:[0],e:"<code>getfile</code> baixa o arquivo. <code>run</code> executa um script da biblioteca; <code>collect</code> e <code>remediate</code> têm outros usos.",c:"Live response é um shell remoto no dispositivo: processos, arquivos, scripts e coleta.",k:"Defender for Endpoint live response comandos"},
+{d:3,q:"Você precisa de um pacote forense com chaves de autoexecução, processos, conexões e logs de eventos de um dispositivo, sem abrir uma sessão interativa. Qual ação usar?",o:["Collect investigation package","Isolate device","Initiate automated investigation","Add indicator"],a:[0],e:"O investigation package reúne artefatos forenses em um ZIP para download.",c:"Ações de dispositivo: isolar, restringir apps, varredura AV, coletar pacote, iniciar AIR, live response.",k:"Defender for Endpoint coletar pacote de investigação"},
+{d:3,q:"O que acontece ao aplicar <b>Restrict app execution</b> a um dispositivo?",o:["O dispositivo é desligado da rede","Só podem ser executados aplicativos assinados pela Microsoft","Todos os aplicativos são desinstalados","O antivírus é desativado"],a:[1],e:"A ação aplica uma política de integridade de código que permite apenas arquivos assinados pela Microsoft.",c:"É útil para conter malware sem cortar a rede.",k:"Defender for Endpoint restringir execução de aplicativos"},
+{d:3,q:"Pelo portal do Defender, você quer desabilitar uma conta do Active Directory <b>local</b> que foi comprometida. Qual componente torna isso possível?",o:["Microsoft Defender for Identity (com conta de ação configurada)","Microsoft Defender for Cloud Apps","Microsoft Entra ID Protection","Microsoft Defender for Office 365"],a:[0],e:"As ações do MDI (desabilitar no AD, forçar redefinição de senha) usam a conta de ação configurada. O Entra ID Protection atua sobre contas da nuvem.",c:"Contas locais → MDI. Contas do Entra → ID Protection e Conditional Access.",k:"Defender for Identity ações de resposta desabilitar usuário"},
+{d:3,q:"Qual recurso do Defender XDR contém automaticamente usuários e dispositivos comprometidos durante ataques de alta confiança, como ransomware operado por humanos?",o:["Automatic attack disruption","Threat analytics","Secure Score","Alert tuning"],a:[0],e:"O automatic attack disruption contém ativos comprometidos (por exemplo, desabilita contas e contém dispositivos) sozinho, para limitar o avanço do ataque.",c:"A disrupção usa sinais de vários produtos do XDR e só age em cenários de alta confiança.",k:"Defender XDR automatic attack disruption"},
+{d:3,q:"Uma regra de automação do Sentinel não consegue executar um playbook. Qual permissão a conta de serviço do Sentinel precisa no grupo de recursos do playbook?",o:["Microsoft Sentinel Automation Contributor","Logic App Operator","Owner","Microsoft Sentinel Reader"],a:[0],e:"A conta de serviço do Sentinel precisa de \"Microsoft Sentinel Automation Contributor\" no grupo de recursos dos playbooks para executá-los a partir de regras de automação.",c:"Essa função existe só para essa finalidade e não é dada a pessoas.",k:"Microsoft Sentinel permissões playbook Automation Contributor"},
+{d:3,q:"Você quer atribuir automaticamente todo incidente de severidade alta a um analista sênior e adicionar a tag \"P1\", <b>sem</b> criar um Logic App. O que usar?",o:["Uma regra de automação","Um playbook","Um workbook","Uma regra Fusion"],a:[0],e:"Regras de automação atribuem dono, mudam status e severidade, adicionam tags e tarefas, sem Logic App. Playbooks servem para lógica complexa e integrações.",c:"Regras de automação = triagem leve e orquestração; playbooks = Logic Apps para SOAR completo.",k:"Microsoft Sentinel regras de automação"},
+{d:3,q:"Em incidentes de phishing, os analistas devem seguir uma lista padronizada de etapas, visível dentro do próprio incidente. O que usar?",o:["Incident tasks (tarefas de incidente), adicionadas por regra de automação","Watchlists","Bookmarks","Comentários no incidente"],a:[0],e:"Incident tasks criam checklists dentro do incidente e podem ser adicionadas automaticamente por regras de automação ou playbooks.",c:"Tarefas padronizam o processo do SOC e mostram o progresso.",k:"Microsoft Sentinel tarefas de incidente"},
+{d:3,q:"Um e-mail de phishing já foi entregue a 300 caixas de correio. Você precisa removê-lo de todas agora. O que fazer?",o:["No Threat Explorer, selecionar as mensagens e usar <i>Take action</i> → exclusão (soft delete)","Criar uma regra de fluxo de e-mail","Bloquear o remetente na Tenant Allow/Block List e aguardar","Pedir que cada usuário apague a mensagem"],a:[0],e:"O Threat Explorer permite remediar mensagens já entregues. Bloquear o remetente ou criar regra de fluxo só afeta mensagens futuras.",c:"O ZAP remove automaticamente o que foi reclassificado como malicioso; o Explorer permite a ação manual.",k:"Threat Explorer remediar e-mails entregues"},
+{d:3,q:"Um scanner de vulnerabilidades interno gera alertas recorrentes no Defender for Cloud. Como impedir que esses alertas específicos apareçam?",o:["Criar uma regra de supressão de alertas","Desabilitar o plano Defender for Servers","Remover a VM da assinatura","Criar uma regra de automação no Sentinel"],a:[0],e:"Regras de supressão no Defender for Cloud ocultam alertas conhecidos e benignos sem desligar a proteção.",c:"Suprimir com condições específicas (tipo de alerta, IP, recurso) em vez de desligar planos.",k:"Defender for Cloud regras de supressão de alertas"},
+{d:3,q:"O Defender for Cloud Apps detectou atividade suspeita de um usuário no Microsoft 365. Qual ação de governança impede imediatamente que ele faça login?",o:["Suspend user","Notify user","Require user to sign in again","Mark as false positive"],a:[0],e:"\"Suspend user\" bloqueia o login. \"Require user to sign in again\" só encerra as sessões, e o usuário pode entrar de novo.",c:"Ações de governança aplicam respostas nos apps conectados ou no Entra ID.",k:"Defender for Cloud Apps ações de governança suspender usuário"},
+{d:3,q:"No Microsoft Entra ID Protection, você seleciona <i>Confirm user compromised</i>. Qual é o efeito?",o:["O risco do usuário passa a ser Alto, e as políticas baseadas em risco são aplicadas","A conta é excluída","A senha é redefinida e enviada por e-mail","Nada acontece até o próximo login"],a:[0],e:"Confirmar o comprometimento eleva o risco do usuário para Alto, o que ativa as políticas de Conditional Access baseadas em risco (bloquear ou exigir troca de senha).",c:"Risco de usuário (credencial vazada) ≠ risco de entrada (login suspeito).",k:"Entra ID Protection confirmar usuário comprometido"},
+{d:3,q:"Um alerta contém um comando PowerShell ofuscado. Qual recurso do Microsoft Security Copilot ajuda a entender rapidamente o que ele faz?",o:["Script analysis","Incident summary","Guided response","Generate KQL query"],a:[0],e:"Script analysis explica scripts e linhas de comando, inclusive ofuscados.",c:"No Defender, o Copilot oferece resumo do incidente, resposta guiada, análise de script e arquivo e KQL a partir de linguagem natural.",k:"Security Copilot Defender análise de script"},
+{d:3,q:"Onde você aprova ou rejeita ações de remediação pendentes geradas por investigações automatizadas no Defender XDR?",o:["Action center","Threat analytics","Secure Score","Advanced hunting"],a:[0],e:"O Action center concentra ações pendentes e concluídas (manuais e automáticas) para aprovação ou desfazimento.",c:"Pending = aguardando aprovação; History = o que foi feito (dá para desfazer).",k:"Defender XDR Action center"},
+{d:3,q:"Um arquivo malicioso está em execução em um dispositivo. Qual ação encerra o processo e coloca o arquivo em quarentena?",o:["Stop and quarantine file","Collect investigation package","Download file","Restrict app execution"],a:[0],e:"Stop and quarantine file encerra os processos e coloca o arquivo em quarentena; pode ser desfeito.",c:"Ações de arquivo: parar e colocar em quarentena, adicionar indicador, baixar, deep analysis.",k:"Defender for Endpoint parar e colocar arquivo em quarentena"},
+{d:3,q:"Você quer impedir a execução de um arquivo (hash SHA-256) em todos os dispositivos e remover as cópias existentes. Qual ação de indicador configurar?",o:["Allow","Audit","Block and remediate","Warn"],a:[2],e:"\"Block and remediate\" impede a execução e remedia as instâncias encontradas. Audit só gera alerta.",c:"Indicadores: arquivo (hash), IP, URL/domínio e certificado, com ação Allow, Audit, Warn, Block ou Block and remediate.",k:"Defender for Endpoint indicadores de arquivo"},
+{d:3,q:"Ordene as etapas para ingerir logs CEF de um appliance no Sentinel:<br>(1) Configurar o appliance para enviar Syslog/CEF ao encaminhador · (2) Instalar a solução de CEF pelo Content hub · (3) Implantar uma VM Linux como encaminhador · (4) Criar a DCR do conector CEF via AMA apontando para o encaminhador",o:["3 → 2 → 4 → 1","1 → 2 → 3 → 4","2 → 1 → 4 → 3","4 → 3 → 1 → 2"],a:[0],e:"Primeiro o encaminhador (3), depois a solução (2), a DCR que instala o AMA no encaminhador (4) e, por fim, o appliance passa a enviar os logs (1).",c:"Na prova, questões de ordenação cobram a dependência entre as etapas: o destino tem que existir antes da origem enviar.",k:"CEF via AMA Microsoft Sentinel"},
+
+{d:4,q:"Qual consulta retorna o número de logins com falha por usuário nas últimas 24 horas?",o:["<pre>SigninLogs\n| where TimeGenerated > ago(1d)\n| where ResultType != \"0\"\n| summarize count() by UserPrincipalName</pre>","<pre>SigninLogs\n| summarize count() by UserPrincipalName\n| where ResultType != \"0\"</pre>","<pre>SigninLogs\n| where ResultType == \"0\"\n| count</pre>","<pre>SigninLogs\n| project UserPrincipalName\n| take 24</pre>"],a:[0],e:"<code>ResultType</code> \"0\" é sucesso. Filtre o tempo e as falhas antes de agregar. Na opção B, <code>ResultType</code> não existe mais depois do <code>summarize</code>.",c:"Ordem típica no KQL: filtrar (where) → projetar ou estender → agregar (summarize) → ordenar.",k:"KQL summarize where SigninLogs"},
+{d:4,q:"Você quer cruzar <code>DeviceProcessEvents</code> com <code>DeviceNetworkEvents</code> do mesmo dispositivo e processo. Qual operador usar?",o:["<code>union</code>","<code>join</code>","<code>extend</code>","<code>mv-expand</code>"],a:[1],e:"<code>join</code> combina linhas por chaves comuns (por exemplo, DeviceId e o ID do processo). <code>union</code> apenas empilha tabelas.",c:"Tipos de join: inner, leftouter, leftanti (o que está à esquerda e não à direita) e outros. O padrão é innerunique.",k:"KQL operador join"},
+{d:4,q:"A coluna <code>AdditionalFields</code> contém JSON. Qual função permite acessar as propriedades internas?",o:["<code>parse_json()</code>","<code>tostring()</code>","<code>split()</code>","<code>bin()</code>"],a:[0],e:"<code>parse_json()</code> converte texto em objeto dinâmico, permitindo <code>campo.propriedade</code> ou <code>campo['prop']</code>.",c:"Colunas dynamic aparecem muito em AuditLogs, AdditionalFields e Entities.",k:"KQL parse_json"},
+{d:4,q:"Em um <code>summarize</code>, você quer a lista de IPs <b>distintos</b> usados por cada usuário. Qual função usar?",o:["<code>make_list()</code>","<code>make_set()</code>","<code>count()</code>","<code>arg_max()</code>"],a:[1],e:"<code>make_set()</code> gera um array de valores distintos. <code>make_list()</code> mantém os repetidos.",c:"Outras úteis: dcount() (contagem distinta), arg_max() (a linha mais recente por chave).",k:"KQL make_set"},
+{d:4,q:"Durante o hunting no Sentinel, você encontra resultados relevantes e quer guardá-los, anotá-los e depois anexá-los a um incidente. O que usar?",o:["Hunting bookmarks","Watchlists","Search jobs","Workbooks"],a:[0],e:"Bookmarks guardam linhas de resultado com notas e entidades e podem ser adicionados a incidentes.",c:"Ciclo do hunting: hipótese → consulta → bookmark → incidente → regra de detecção.",k:"Microsoft Sentinel hunting bookmarks"},
+{d:4,q:"Você precisa procurar um IP em <b>um ano</b> de logs, parte deles em retenção de longo prazo. Qual recurso do Sentinel usar?",o:["Search job","Regra NRT","Livestream","Watchlist"],a:[0],e:"Search jobs varrem grandes volumes (inclusive dados arquivados e tabelas Basic) de forma assíncrona; os resultados vão para uma tabela <code>_SRCH</code>.",c:"Search = procurar um termo em muito dado. Restore = trazer um período inteiro de volta para consulta interativa.",k:"Microsoft Sentinel search jobs"},
+{d:4,q:"Você precisa de consultas interativas completas, por vários dias, em dados arquivados de um período específico. Qual operação usar e qual sufixo terá a tabela criada?",o:["Restore — sufixo <code>_RST</code>","Search job — sufixo <code>_CL</code>","Export — sufixo <code>_EXP</code>","Ingestion — sufixo <code>_ARC</code>"],a:[0],e:"Restore traz dados arquivados de volta para consulta interativa em uma tabela <code>_RST</code>. (<code>_CL</code> é o sufixo de tabelas de logs personalizados.)",c:"Sufixos: _CL (custom log), _SRCH (search job), _RST (restore).",k:"Log Analytics restaurar logs arquivados"},
+{d:4,q:"Você quer usar Python e a biblioteca MSTICPy para análises avançadas sobre dados do Sentinel. O que usar?",o:["Notebooks (Jupyter)","Workbooks","Playbooks","Regras de análise"],a:[0],e:"Os notebooks Jupyter do Sentinel (via Azure ML) integram Python e MSTICPy para enriquecimento, visualização e ML.",c:"Workbooks = dashboards; Playbooks = automação; Notebooks = análise com código.",k:"Microsoft Sentinel notebooks MSTICPy"},
+{d:4,q:"No advanced hunting, qual tabela mostra os <b>cliques</b> de usuários em URLs protegidas pelo Safe Links?",o:["<code>EmailEvents</code>","<code>EmailUrlInfo</code>","<code>UrlClickEvents</code>","<code>DeviceNetworkEvents</code>"],a:[2],e:"<code>UrlClickEvents</code> registra os cliques em links protegidos pelo Safe Links. <code>EmailUrlInfo</code> lista as URLs contidas nos e-mails.",c:"Tabelas de e-mail: EmailEvents, EmailAttachmentInfo, EmailUrlInfo, EmailPostDeliveryEvents, UrlClickEvents.",k:"advanced hunting UrlClickEvents"},
+{d:4,q:"Você quer encontrar autenticações NTLM contra controladores de domínio observadas pelo Defender for Identity. Qual tabela consultar?",o:["<code>IdentityLogonEvents</code>","<code>DeviceLogonEvents</code>","<code>SigninLogs</code>","<code>AuditLogs</code>"],a:[0],e:"<code>IdentityLogonEvents</code> contém as autenticações observadas pelo MDI no AD (NTLM, Kerberos) e no Entra ID.",c:"Prefixos: Device* (MDE), Email* (MDO), Identity* (MDI), CloudAppEvents (MDCA).",k:"advanced hunting IdentityLogonEvents"},
+{d:4,q:"Qual recurso do Defender XDR traz relatórios de especialistas sobre campanhas e ameaças emergentes, mostrando quais ativos da organização estão expostos?",o:["Threat analytics","Action center","Content hub","Secure Score"],a:[0],e:"Threat analytics publica relatórios com exposição, mitigações recomendadas e consultas de hunting relacionadas.",c:"Use para priorizar: quais ameaças atuais afetam o seu ambiente.",k:"Defender XDR threat analytics"},
+{d:4,q:"Qual consulta conta eventos de processo em intervalos de 1 hora, para montar um gráfico de série temporal?",o:["<pre>DeviceProcessEvents\n| summarize count() by bin(Timestamp, 1h)</pre>","<pre>DeviceProcessEvents\n| summarize count() by Timestamp</pre>","<pre>DeviceProcessEvents\n| take 1h</pre>","<pre>DeviceProcessEvents\n| where Timestamp == 1h</pre>"],a:[0],e:"<code>bin()</code> arredonda os horários para intervalos fixos, o que é ideal para <code>render timechart</code>.",c:"No Defender XDR a coluna de tempo é Timestamp; no Sentinel/Log Analytics é TimeGenerated.",k:"KQL bin função"},
+{d:4,q:"Você quer usar, dentro de uma consulta KQL, uma lista de IOCs em um CSV publicado em uma URL, sem importá-la para o workspace. Qual operador usar?",o:["<code>externaldata</code>","<code>_GetWatchlist</code>","<code>materialize</code>","<code>datatable</code>"],a:[0],e:"<code>externaldata</code> lê dados de uma URL externa (CSV, JSON) durante a execução. <code>datatable</code> define dados fixos na própria consulta.",c:"Para listas mantidas no Sentinel, use watchlists; para fontes externas, externaldata.",k:"KQL externaldata"},
+{d:4,q:"No advanced hunting, qual tabela lista as vulnerabilidades (CVEs) de software encontradas nos dispositivos?",o:["<code>DeviceTvmSoftwareVulnerabilities</code>","<code>DeviceInfo</code>","<code>DeviceFileEvents</code>","<code>AlertEvidence</code>"],a:[0],e:"<code>DeviceTvmSoftwareVulnerabilities</code> lista as CVEs por dispositivo e software, segundo o Defender Vulnerability Management.",c:"Tabelas DeviceTvm* trazem inventário, vulnerabilidades e configurações seguras.",k:"DeviceTvmSoftwareVulnerabilities"},
+{d:4,q:"Você quer encontrar as consultas de hunting que cobrem a tática <i>Lateral Movement</i> do MITRE ATT&amp;CK e ver lacunas de cobertura no Sentinel. Onde fazer isso?",o:["Na página Hunting (filtrando por tática) e na página MITRE ATT&amp;CK do Sentinel","No Secure Score","Em Watchlists","No Action center"],a:[0],e:"As consultas de hunting são marcadas com táticas e técnicas do MITRE, e a página MITRE ATT&amp;CK mostra a cobertura das regras ativas e as lacunas.",c:"O MITRE ATT&amp;CK organiza o comportamento de atacantes em táticas (o objetivo) e técnicas (o como).",k:"Microsoft Sentinel MITRE ATT&CK cobertura"},
+
+/* ===== Formatos da prova: tela simulada, hotspot, arrastar e soltar, sim/não, estudo de caso ===== */
+{d:4,scr:{cap:"Advanced hunting · consulta e resultado",html:`<div class="kql">DeviceProcessEvents
+| where Timestamp > ago(7d)
+| where FileName =~ "powershell.exe"
+| where ProcessCommandLine has_any ("-enc", "-EncodedCommand")
+| summarize Execucoes = count() by DeviceName
+| top 3 by Execucoes</div>
+<table><tr><th>DeviceName</th><th>Execucoes</th></tr><tr><td>srv-app-01</td><td>47</td></tr><tr><td>nb-fin-017</td><td>12</td></tr><tr><td>nb-rh-004</td><td>3</td></tr></table>`},
+ q:"Observe a consulta e o resultado na tela. O que o resultado representa?",o:["Os 3 dispositivos com mais execuções de PowerShell com comando codificado nos últimos 7 dias","Todas as execuções de PowerShell dos últimos 7 dias","Os 3 usuários que mais executaram PowerShell","Os 3 primeiros eventos de PowerShell encontrados, sem ordem definida"],a:[0],
+ e:"A consulta filtra 7 dias, só <code>powershell.exe</code> (<code>=~</code> ignora maiúsculas), só linhas de comando com <code>-enc</code>/<code>-EncodedCommand</code>, conta por <code>DeviceName</code> e mantém os 3 maiores (<code>top 3 by</code>). Não há coluna de usuário no resultado.",
+ c:"PowerShell com comando codificado (Base64) é uma técnica comum de ofuscação (MITRE T1027 / T1059.001). Leia KQL de cima para baixo: cada linha recebe o resultado da anterior.",k:"KQL top summarize advanced hunting"},
+
+{d:3,scr:{cap:"Portal do Defender · Dispositivos · nb-fin-017",html:`<div class="sgrid"><span>Dispositivo</span><span><b>nb-fin-017</b></span><span>Status</span><span><span class="sbadge r">Isolado</span></span><span>Nível de risco</span><span><span class="sbadge r">Alto</span></span><span>Último alerta</span><span>Execução de DLL suspeita em C:\\Temp\\upd.dll</span></div>
+<div class="sbtns"><span class="sbtn">Liberar do isolamento</span><span class="sbtn">Restringir execução de aplicativos</span><span class="sbtn">Executar verificação antivírus</span><span class="sbtn">Coletar pacote de investigação</span><span class="sbtn">Iniciar sessão de resposta ao vivo</span></div>`},
+ q:"O dispositivo da tela já está isolado. Você precisa obter uma cópia do arquivo <code>C:\\Temp\\upd.dll</code> para análise, sem expor a rede. O que fazer?",o:["Liberar o isolamento, copiar o arquivo e isolar de novo","Iniciar uma sessão de resposta ao vivo e usar o comando <code>getfile</code>","Coletar o pacote de investigação, que inclui todos os arquivos de C:\\Temp","Não é possível obter arquivos de um dispositivo isolado"],a:[1],
+ e:"Um dispositivo isolado continua conectado ao serviço do Defender, então o live response funciona e o <code>getfile</code> baixa o arquivo. O pacote de investigação traz artefatos predefinidos (processos, autoruns, logs), não arquivos arbitrários. Liberar o isolamento expõe a rede sem necessidade.",
+ c:"Isolar primeiro, investigar depois: o isolamento não atrapalha as ferramentas de resposta do próprio Defender.",k:"Defender for Endpoint live response getfile isolamento"},
+
+{d:2,scr:{cap:"Microsoft Sentinel · Regra de análise agendada · Configuração",html:`<div class="sgrid"><span>Frequência da consulta</span><span>A cada 5 minutos</span><span>Período de consulta</span><span>Última 1 hora</span><span>Limite do alerta</span><span>Número de resultados maior que 0</span><span>Agrupamento de eventos</span><span><b>Agrupar todos os eventos em um único alerta</b></span><span>Supressão</span><span><span class="sbadge n">Desativada</span></span><span>Criar incidentes a partir dos alertas</span><span><span class="sbadge g">Ativado</span></span><span>Agrupamento de alertas</span><span><span class="sbadge n">Desativado</span></span></div>`},
+ q:"Com a configuração da tela, uma execução da regra retorna 12 linhas. Quantos alertas e incidentes essa execução gera?",o:["12 alertas e 12 incidentes","1 alerta e 1 incidente","12 alertas e 1 incidente","1 alerta e nenhum incidente"],a:[1],
+ e:"\"Agrupar todos os eventos em um único alerta\" gera 1 alerta por execução, não importa quantas linhas. Com criação de incidentes ativada e sem agrupamento de alertas, esse alerta vira 1 incidente. Se a opção fosse \"Disparar um alerta para cada evento\", seriam 12 alertas.",
+ c:"Dica de prova: frequência de 5 min com período de 1 h faz as janelas se sobreporem. Os mesmos eventos podem disparar de novo nas próximas execuções; para evitar isso existe a supressão.",k:"Microsoft Sentinel agrupamento de eventos regra agendada"},
+
+{d:1,scr:{cap:"Microsoft Sentinel · Conectores de dados",html:`<table><tr><th>Conector</th><th>Status</th></tr><tr><td>Microsoft Defender XDR</td><td><span class="sbadge g">Conectado</span></td></tr><tr><td>Syslog via AMA</td><td><span class="sbadge g">Conectado</span></td></tr><tr><td>Windows Security Events via AMA</td><td><span class="sbadge g">Conectado</span></td></tr><tr><td>Common Event Format (CEF) via AMA</td><td><span class="sbadge n">Não instalado</span></td></tr></table>
+<div class="kql">CommonSecurityLog
+| where DeviceVendor == "Palo Alto Networks"</div><div class="note">Resultado: nenhum registro encontrado.</div>`},
+ q:"O firewall Palo Alto envia logs em formato CEF para o encaminhador Linux da empresa. A consulta da tela não retorna nada. Qual é a causa mais provável?",o:["A solução e a DCR do conector CEF via AMA não foram configuradas, então nada é gravado na CommonSecurityLog","O conector Syslog via AMA grava CEF na CommonSecurityLog automaticamente; basta esperar 24 horas","A tabela CommonSecurityLog só pode ser consultada no plano Basic","É preciso desconectar o conector Microsoft Defender XDR"],a:[0],
+ e:"Uma DCR de Syslog grava na tabela <code>Syslog</code>, sem interpretar o CEF. Para os dados chegarem à <code>CommonSecurityLog</code> já separados em campos, é preciso a solução de CEF e uma DCR do conector CEF via AMA.",
+ c:"Syslog via AMA → tabela Syslog. CEF via AMA → tabela CommonSecurityLog. Os dois podem usar o mesmo encaminhador Linux.",k:"CEF via AMA CommonSecurityLog"},
+
+{d:4,scr:{cap:"Log Analytics · SigninLogs · últimos 10 minutos",html:`<table><tr><th>TimeGenerated</th><th>UserPrincipalName</th><th>IPAddress</th><th>ResultType</th></tr>
+<tr><td>09:41:02</td><td>ana@luminavarejo.example</td><td>203.0.113.45</td><td>50126</td></tr>
+<tr><td>09:41:09</td><td>bruno@luminavarejo.example</td><td>203.0.113.45</td><td>50126</td></tr>
+<tr><td>09:41:15</td><td>carla@luminavarejo.example</td><td>203.0.113.45</td><td>50126</td></tr>
+<tr><td>09:41:22</td><td>diego@luminavarejo.example</td><td>203.0.113.45</td><td>50126</td></tr>
+<tr><td>09:41:30</td><td>elisa@luminavarejo.example</td><td>203.0.113.45</td><td>50126</td></tr>
+<tr><td>09:41:37</td><td>fabio@luminavarejo.example</td><td>203.0.113.45</td><td><b>0</b></td></tr></table>`},
+ q:"Analise os registros de login da tela. O que eles indicam?",o:["Força bruta contra uma única conta","Password spray a partir de 203.0.113.45, com login bem-sucedido na conta de fabio","Ataque de fadiga de MFA","Reutilização de token de sessão roubado"],a:[1],
+ e:"O mesmo IP tenta uma senha em várias contas diferentes em poucos segundos (<code>50126</code> = usuário ou senha inválidos) e acerta uma (<code>0</code> = sucesso). Isso é password spray. Força bruta seria muitas tentativas na mesma conta. Próximos passos: tratar fabio como comprometido (revogar sessões, redefinir senha, exigir MFA) e bloquear o IP.",
+ c:"Password spray = poucas senhas comuns × muitas contas, para não disparar o bloqueio por conta.",k:"password spray detecção Entra ID"},
+
+{d:4,t:"hot",
+ q:"Complete a consulta para listar quantas conexões cada dispositivo fez com IPs da watchlist <code>IPsMaliciosos</code> nas últimas 24 horas.",
+ tpl:`<pre>DeviceNetworkEvents
+| where Timestamp > ago(1d)
+| where RemoteIP {{0}} (_GetWatchlist('IPsMaliciosos') | project SearchKey)
+| {{1}} Conexoes = count() by DeviceName</pre>`,
+ opts:[["in","has","==","contains"],["summarize","extend","project","render"]],a:[0,0],
+ e:"<code>in</code> compara a coluna com a lista retornada pela subconsulta (a coluna <code>SearchKey</code> da watchlist). <code>summarize ... count() by DeviceName</code> agrega por dispositivo. <code>extend</code> e <code>project</code> não agregam.",
+ c:"Em questões de hotspot com KQL, pense no que cada operador recebe e devolve: filtro (where/in), agregação (summarize), formatação (project/extend).",k:"KQL operador in subconsulta"},
+
+{d:2,t:"hot",
+ q:"Você está configurando uma regra de análise agendada. Selecione as opções que atendem aos dois requisitos.",
+ tpl:`<p>Gerar alerta somente quando a consulta retornar mais de 10 linhas: configure {{0}}.</p><p>Depois de um disparo, não gerar novos alertas da regra por 1 hora: configure {{1}}.</p>`,
+ opts:[["o limite do alerta como “maior que 10”","a frequência da consulta para 10 minutos","o agrupamento de eventos","o período de consulta para 10 horas"],["a supressão por 1 hora","o agrupamento de alertas por 1 hora","o período de consulta para 1 hora","a frequência da consulta para 1 hora"]],a:[0,0],
+ e:"O limite do alerta (alert threshold) define quantos resultados são necessários para disparar. A supressão para de gerar alertas por um tempo depois de um disparo. O agrupamento de alertas só junta alertas em incidentes, sem impedir que sejam gerados.",
+ c:"Frequência = quando a regra roda. Período = quanto tempo de dados ela olha. Limite = quando ela dispara. Supressão = pausa depois de disparar.",k:"Microsoft Sentinel regra agendada limite supressão"},
+
+{d:4,t:"hot",
+ q:"Complete a consulta para listar os usuários que fizeram login nas últimas 24 horas, mas <b>não</b> haviam feito login nos 30 dias anteriores.",
+ tpl:`<pre>let antigos = SigninLogs
+    | where TimeGenerated between (ago(30d) .. ago(1d))
+    | distinct UserPrincipalName;
+SigninLogs
+| where TimeGenerated > ago(1d)
+| join kind={{0}} antigos on UserPrincipalName
+| {{1}} UserPrincipalName</pre>`,
+ opts:[["inner","leftanti","leftouter","rightsemi"],["distinct","take","top","sort by"]],a:[1,0],
+ e:"<code>leftanti</code> mantém as linhas da esquerda (logins recentes) que <b>não</b> têm correspondência na direita (usuários antigos). <code>distinct</code> mostra cada usuário uma vez. <code>inner</code> faria o contrário: só quem já existia.",
+ c:"leftanti = \"está aqui e não está lá\", muito usado para achar o que é novo ou incomum.",k:"KQL join leftanti"},
+
+{d:4,t:"drag",
+ q:"Associe cada tipo de dado à tabela do advanced hunting onde ele é encontrado. Nem todas as tabelas serão usadas.",
+ targets:["Criação de processos em endpoints","E-mails entregues ou bloqueados","Autenticações no Active Directory local","Atividades em apps SaaS, como o Microsoft 365"],
+ pool:["DeviceProcessEvents","EmailEvents","IdentityLogonEvents","CloudAppEvents","DeviceRegistryEvents","AlertInfo"],a:[0,1,2,3],
+ e:"<code>DeviceProcessEvents</code> (MDE) registra processos; <code>EmailEvents</code> (MDO), e-mails; <code>IdentityLogonEvents</code> (MDI), autenticações no AD; <code>CloudAppEvents</code> (MDCA), atividades em apps de nuvem. <code>DeviceRegistryEvents</code> é registro do Windows e <code>AlertInfo</code> é sobre alertas.",
+ c:"O prefixo do nome da tabela indica o produto que gera os dados: Device*, Email*, Identity*, CloudApp*.",k:"advanced hunting esquema tabelas"},
+
+{d:3,t:"drag",
+ q:"Você precisa que um playbook seja executado automaticamente quando certos incidentes forem criados no Sentinel. Coloque as etapas na ordem correta.",
+ targets:["1ª etapa","2ª etapa","3ª etapa","4ª etapa"],
+ pool:["Criar o Logic App com o gatilho de incidente do Microsoft Sentinel","Conceder ao Sentinel a função Automation Contributor no grupo de recursos do playbook","Criar a regra de automação com a ação “Executar playbook”","Validar o resultado em um novo incidente gerado pela regra"],a:[0,1,2,3],
+ e:"O playbook precisa existir antes (1). Depois o Sentinel precisa de permissão para executá-lo (2); sem isso o playbook nem aparece como opção na regra de automação. Em seguida vem a regra que o dispara (3) e, por fim, a validação (4).",
+ c:"Playbook = Logic App com gatilho do Sentinel. Ele é disparado por uma regra de automação ou executado manualmente.",k:"Microsoft Sentinel playbook regra de automação"},
+
+{d:1,t:"drag",
+ q:"Associe cada necessidade ao recurso adequado do Sentinel/Log Analytics. Nem todos os recursos serão usados.",
+ targets:["Logs usados por regras de detecção agendadas","Logs de depuração volumosos, consultados raramente","Procurar um IP em 2 anos de dados","Investigar a fundo um mês específico de dados arquivados"],
+ pool:["Plano Analytics","Plano Basic","Search job","Restore","Workbook","Watchlist"],a:[0,1,2,3],
+ e:"Regras de detecção precisam do plano Analytics. Logs volumosos e pouco consultados vão para o Basic. Para procurar um termo em muito dado, use um search job; para consultar um período arquivado de forma interativa, use restore.",
+ c:"Custo × capacidade de consulta: Analytics (completo) > Basic (limitado) > retenção de longo prazo (só search ou restore).",k:"Microsoft Sentinel retenção search restore"},
+
+{d:3,t:"yn",
+ q:"Para cada afirmação sobre o isolamento de dispositivos no Defender for Endpoint, selecione Sim se for verdadeira ou Não se for falsa.",
+ s:["Um dispositivo isolado continua se comunicando com o serviço do Defender for Endpoint.","O isolamento seletivo pode manter o Outlook e o Teams funcionando.","Para isolar um dispositivo, o Defender Antivirus precisa estar em modo passivo."],a:[true,true,false],
+ e:"O isolamento mantém a conexão com o serviço para que a investigação continue. O isolamento seletivo permite Outlook, Teams e Skype for Business para comunicação. O modo do antivírus não é pré-requisito para isolar.",
+ c:"Nas questões de Sim/Não, cada afirmação é independente. Avalie uma de cada vez.",k:"Defender for Endpoint isolar dispositivo"},
+
+{d:3,t:"yn",
+ q:"Para cada afirmação sobre as regras de automação do Microsoft Sentinel, selecione Sim se for verdadeira ou Não se for falsa.",
+ s:["Regras de automação podem executar playbooks.","Regras de automação podem ser disparadas quando um incidente é atualizado.","Toda regra de automação exige a criação de um Logic App."],a:[true,true,false],
+ e:"Regras de automação têm gatilhos de incidente criado, incidente atualizado e alerta criado, e podem executar playbooks. Ações como atribuir dono, mudar status e severidade, ou adicionar tags e tarefas não precisam de Logic App.",
+ c:"Regra de automação = o \"quando\" e as ações simples. Playbook = o \"como\" quando a lógica é complexa.",k:"Microsoft Sentinel regras de automação gatilhos"},
+
+{d:4,t:"yn",
+ q:"Para cada afirmação sobre KQL, selecione Sim se for verdadeira ou Não se for falsa.",
+ s:["Para procurar termos inteiros, <code>has</code> geralmente é mais eficiente que <code>contains</code>.","O operador <code>=~</code> compara textos sem diferenciar maiúsculas de minúsculas.","<code>project</code> adiciona novas colunas mantendo todas as colunas existentes."],a:[true,true,false],
+ e:"<code>has</code> usa o índice de termos e é mais rápido que <code>contains</code>, que procura qualquer trecho. <code>=~</code> é a igualdade sem diferenciar maiúsculas. Quem adiciona colunas mantendo as existentes é <code>extend</code>; <code>project</code> mantém só as colunas listadas.",
+ c:"Desempenho no KQL: filtre cedo, prefira has a contains e == a =~ quando possível.",k:"KQL has contains desempenho"},
+
+{d:3,cs:"lumina",
+ q:"Para atender ao requisito R3, o que você deve implementar? <b>(Escolha duas)</b>",
+ o:["Instalar o sensor do Defender for Identity nos quatro controladores de domínio","Configurar a conta de ação (action account) do Defender for Identity","Criar uma política de risco de usuário no Entra ID Protection","Instalar o Azure Monitor Agent nos controladores de domínio"],a:[0,1],
+ e:"Desabilitar contas do AD local pelo portal do Defender é uma ação do Defender for Identity. Ela exige o sensor nos DCs e uma conta de ação com permissão no AD. O Entra ID Protection atua sobre contas da nuvem, e o AMA só coleta logs.",
+ c:"No estudo de caso, ligue cada requisito (R1, R2…) a um recurso. Os requisitos são as pistas.",k:"Defender for Identity conta de ação"},
+
+{d:1,cs:"lumina",t:"yn",
+ q:"Sobre o requisito R4, selecione Sim se a afirmação for verdadeira ou Não se for falsa.",
+ s:["Definir a retenção interativa da tabela CommonSecurityLog em 90 dias e a retenção total em 2 anos atende ao R4.","Com o Microsoft Sentinel habilitado, os primeiros 90 dias de retenção interativa não têm custo adicional.","Regras de análise agendadas conseguem consultar dados que estão apenas na retenção de longo prazo."],a:[true,true,false],
+ e:"A retenção interativa de 90 dias atende às consultas, e a retenção total de 2 anos guarda o restante a baixo custo. Workspaces com Sentinel incluem 90 dias de retenção interativa sem custo extra. Dados em retenção de longo prazo só são acessados por search job ou restore, não por regras.",
+ c:"Retenção interativa = consultável a qualquer momento. Retenção de longo prazo = barata, mas exige search job ou restore.",k:"Log Analytics retenção de longo prazo Sentinel"},
+
+{d:3,cs:"lumina",t:"hot",
+ q:"Você precisa configurar uma regra de automação para atender ao requisito R5. Selecione as opções corretas.",
+ tpl:`<p><b>Gatilho:</b> {{0}}</p><p><b>Condição:</b> {{1}}</p><p><b>Ações:</b> {{2}}</p>`,
+ opts:[["Quando o incidente é criado","Quando o alerta é criado","Quando o incidente é atualizado"],["Nome da regra de análise contém “Login de executivo fora do país”","Severidade igual a Alta","Status igual a Novo"],["Alterar severidade para Alta + Atribuir proprietário a Ana Souza","Executar playbook","Adicionar a tag “Executivo”"]],a:[0,0,0],
+ e:"O R5 vale para incidentes novos gerados por uma regra específica: gatilho \"incidente criado\" e condição pelo nome da regra de análise. Mudar a severidade e atribuir o dono são ações nativas, então não é preciso playbook, o que também atende ao R6 (menor esforço administrativo).",
+ c:"Sempre que o caso disser \"minimizar esforço administrativo\", prefira o recurso nativo e mais simples.",k:"Microsoft Sentinel regras de automação condições"},
+
+{d:1,cs:"lumina",t:"drag",
+ q:"Associe cada requisito da Lumina ao recurso que o atende. Nem todos os recursos serão usados.",
+ targets:["R1 — Fila única de incidentes","R2 — N1 fecha incidentes sem alterar regras","R3 — Desabilitar contas do AD local","R5 — Severidade e dono automáticos"],
+ pool:["Conectar o Sentinel ao portal do Defender","Função Microsoft Sentinel Responder","Defender for Identity com conta de ação","Regra de automação","Playbook (Logic App)","Função Microsoft Sentinel Contributor","Defender for Cloud Apps"],a:[0,1,2,3],
+ e:"R1: a plataforma unificada no portal do Defender. R2: o Responder gerencia incidentes sem editar regras (Contributor pode demais). R3: ação de resposta do Defender for Identity. R5: regra de automação, que é mais simples que um playbook (R6).",
+ c:"Distratores comuns: a opção que funciona, mas com mais permissão (Contributor) ou mais esforço (Playbook) do que o necessário.",k:"Microsoft Sentinel portal do Defender funções"},
+
+/* ===== Lote 3 — Domínio 1 ===== */
+{d:1,q:"A empresa tem 3.000 notebooks Windows 11 gerenciados pelo Microsoft Intune. Qual é o método recomendado para integrá-los ao Defender for Endpoint?",o:["Script local executado manualmente em cada notebook","Política de EDR (Endpoint detection and response) no Intune, usando a conexão entre Intune e Defender for Endpoint","Instalar o Azure Monitor Agent","Criar uma regra de coleta de dados no Sentinel"],a:[1],e:"Com dispositivos já gerenciados pelo Intune, a forma recomendada é conectar o Intune ao MDE e distribuir uma política de EDR. O script local serve para testes ou poucos dispositivos, e o AMA coleta logs, não faz a integração.",c:"Métodos de integração: Intune, Configuration Manager, GPO, script local, VDI, Defender for Cloud (servidores) e ferramentas como Ansible ou Puppet para Linux e macOS.",k:"Defender for Endpoint integração Intune"},
+{d:1,q:"Você precisa integrar 200 servidores Linux ao Defender for Endpoint e a equipe já usa Ansible. Qual abordagem usar?",o:["Distribuir o instalador e o pacote de integração para Linux com um playbook do Ansible","Usar uma GPO do Active Directory","Isso só é possível pelo Intune","Instalar o sensor do Defender for Identity"],a:[0],e:"O MDE para Linux pode ser implantado com Ansible, Puppet, Chef, Saltstack ou script: instala-se o agente (mdatp) e aplica-se o pacote de integração baixado do portal.",c:"Para servidores no Azure, AWS ou GCP, o Defender for Servers também pode implantar o MDE automaticamente.",k:"Defender for Endpoint Linux implantação Ansible"},
+{d:1,q:"Um malware tenta desativar o Microsoft Defender Antivirus e excluir suas configurações. Qual recurso impede isso?",o:["Proteção contra adulteração (tamper protection)","Acesso controlado a pastas","Isolamento de dispositivo","Web content filtering"],a:[0],e:"A proteção contra adulteração bloqueia mudanças nas configurações de segurança, como desativar a proteção em tempo real, feitas fora dos canais de gerenciamento autorizados.",c:"A proteção contra adulteração deve estar ativa em todos os dispositivos e é gerenciada pelo portal do Defender ou pelo Intune.",k:"Defender for Endpoint proteção contra adulteração"},
+{d:1,q:"A empresa usa um antivírus de terceiros como principal, e o Defender Antivirus está em modo passivo. Você quer que o Defender for Endpoint ainda bloqueie e remedie artefatos maliciosos detectados pelo EDR. O que habilitar?",o:["EDR em modo bloqueio (EDR in block mode)","Regras ASR em modo auditoria","Modo de verificação completa","Restringir execução de aplicativos"],a:[0],e:"O EDR em modo bloqueio permite que o MDE remedie artefatos detectados pelo EDR mesmo quando o Defender Antivirus não é o antivírus principal.",c:"Defender AV em modo ativo, passivo ou desabilitado muda o que o MDE consegue bloquear. O EDR em modo bloqueio cobre a lacuna do modo passivo.",k:"EDR em modo bloqueio Defender for Endpoint"},
+{d:1,q:"Você quer um único modelo de permissões para gerenciar o acesso de analistas ao Defender for Endpoint, Office 365, Identity e Cloud Apps no portal do Defender. O que usar?",o:["RBAC unificado do Microsoft Defender XDR","Funções separadas em cada produto","Unidades administrativas do Entra ID","Funções do Azure RBAC na assinatura"],a:[0],e:"O RBAC unificado do Defender XDR centraliza as permissões das cargas de trabalho do Defender em um único modelo, com funções personalizadas e escopo por fonte de dados.",c:"Funções globais do Entra (como Security Administrator) também dão acesso, mas ferem o menor privilégio. Prefira funções personalizadas no RBAC unificado.",k:"Defender XDR RBAC unificado"},
+{d:1,q:"Um provedor de serviços de segurança (MSSP) precisa operar o Sentinel de 15 clientes a partir do próprio tenant, sem criar contas convidadas em cada cliente. O que usar?",o:["Azure Lighthouse","Contas B2B convidadas","Um workspace por cliente no tenant do MSSP","Microsoft Entra Connect"],a:[0],e:"O Azure Lighthouse delega o acesso aos recursos dos clientes (workspaces do Sentinel) para identidades no tenant do MSSP, sem trocar de tenant e sem contas convidadas.",c:"Cenários multitenant do Sentinel: Azure Lighthouse para gerenciar e consultas entre workspaces para correlacionar.",k:"Microsoft Sentinel MSSP Azure Lighthouse"},
+{d:1,q:"Seu workspace do Sentinel ingere cerca de 250 GB por dia, de forma estável. Como reduzir o custo de ingestão sem perder dados?",o:["Contratar um nível de compromisso (commitment tier) adequado ao volume","Desabilitar o Sentinel nos fins de semana","Mover todas as tabelas para retenção de longo prazo","Excluir o workspace e recriá-lo todo mês"],a:[0],e:"Os commitment tiers (a partir de 100 GB/dia) dão desconto em relação ao pagamento por GB quando o volume é previsível.",c:"Alavancas de custo: commitment tier, plano Basic ou Auxiliary, transformações na ingestão e retenção bem dimensionada.",k:"Microsoft Sentinel commitment tiers preços"},
+{d:1,q:"Você quer descartar eventos irrelevantes e remover colunas desnecessárias <b>antes</b> de os dados serem gravados no workspace, para reduzir custo. O que configurar?",o:["Uma transformação no momento da ingestão (KQL na regra de coleta de dados)","Uma regra de análise que exclui os dados depois","Um workbook com filtro","Uma watchlist de exclusão"],a:[0],e:"Transformações na DCR aplicam uma consulta KQL (<code>source | where ... | project-away ...</code>) aos dados em trânsito. O que é filtrado não é gravado nem cobrado como ingestão no workspace.",c:"Depois de gravados, os dados não podem ser editados. Filtre na origem ou na ingestão.",k:"transformações no momento da ingestão DCR"},
+{d:1,q:"Você quer visualizar caminhos de ataque que um invasor poderia seguir na nuvem (por exemplo, de uma VM exposta na internet até um banco de dados sensível). Qual plano do Defender for Cloud oferece isso?",o:["Defender CSPM","CSPM básico (gratuito)","Defender for Storage","Defender for App Service"],a:[0],e:"A análise de caminhos de ataque e o cloud security explorer fazem parte do plano pago Defender CSPM. O CSPM gratuito oferece recomendações e secure score.",c:"CSPM = postura (configurações, riscos). CWP = proteção das cargas (Servers, Storage, Containers…).",k:"Defender CSPM análise de caminho de ataque"},
+{d:1,q:"Você quer que as portas RDP e SSH das VMs só fiquem abertas quando um administrador pedir, por tempo limitado e para o IP dele. O que usar?",o:["Acesso just-in-time (JIT) às VMs no Defender for Servers","Isolamento de dispositivo","Regra ASR","Azure Lighthouse"],a:[0],e:"O JIT fecha as portas de gerenciamento no NSG ou no firewall e só as abre sob demanda, por tempo e IP definidos, deixando registro.",c:"O JIT faz parte do Defender for Servers Plano 2.",k:"acesso just-in-time VM Defender for Cloud"},
+{d:1,q:"Que tipo de conta o Microsoft recomenda como conta de serviço de diretório (DSA) do Defender for Identity?",o:["Conta de serviço gerenciada de grupo (gMSA)","Conta de Domain Admin","Conta de usuário comum com senha que nunca expira","Conta local do controlador de domínio"],a:[0],e:"A gMSA tem senha gerenciada automaticamente pelo AD e é a opção recomendada. Usar Domain Admin dá privilégio excessivo.",c:"O sensor usa a DSA para consultar o AD (por exemplo, para mapear entidades e caminhos de movimento lateral).",k:"Defender for Identity conta de serviço de diretório gMSA"},
+{d:1,q:"Você habilitou o UEBA no Sentinel. Em qual tabela ficam os comportamentos enriquecidos e as anomalias por entidade?",o:["<code>BehaviorAnalytics</code>","<code>SecurityAlert</code>","<code>Heartbeat</code>","<code>Usage</code>"],a:[0],e:"O UEBA grava em <code>BehaviorAnalytics</code> (atividades com enriquecimento e pontuação de investigação) e mantém <code>IdentityInfo</code> e <code>UserPeerAnalytics</code>.",c:"O UEBA cria perfis de comportamento de usuários e hosts para destacar desvios.",k:"Microsoft Sentinel UEBA BehaviorAnalytics"},
+{d:1,q:"Você precisa encontrar dispositivos da rede corporativa que ainda <b>não</b> estão integrados ao Defender for Endpoint. Qual recurso usar?",o:["Descoberta de dispositivos (device discovery)","Threat analytics","Live response","Alert tuning"],a:[0],e:"A descoberta de dispositivos usa os endpoints já integrados para encontrar dispositivos não gerenciados na rede e listá-los no inventário.",c:"O que não está integrado não é protegido. A descoberta ajuda a fechar essas lacunas.",k:"Defender for Endpoint descoberta de dispositivos"},
+{d:1,q:"A equipe quer versionar regras de análise, workbooks e playbooks do Sentinel em um repositório do GitHub e implantá-los automaticamente. O que usar?",o:["Repositórios (Repositories) do Microsoft Sentinel","Watchlists","Content hub","Notebooks"],a:[0],e:"Os Repositórios conectam o Sentinel ao GitHub ou ao Azure DevOps e implantam o conteúdo personalizado a partir do código (CI/CD).",c:"Conteúdo como código: revisão, histórico e implantação padronizada entre workspaces.",k:"Microsoft Sentinel repositórios CI/CD"},
+
+/* ===== Lote 3 — Domínio 2 ===== */
+{d:2,q:"Você quer bloquear o acesso a sites de categorias como jogos de azar e conteúdo adulto em todos os dispositivos, em qualquer navegador. O que configurar no Defender for Endpoint?",o:["Web content filtering","Safe Links","Regra ASR","Controlled folder access"],a:[0],e:"O web content filtering bloqueia sites por categoria em todos os navegadores. Ele depende da Network Protection.",c:"Proteção web do MDE: proteção contra ameaças web, indicadores personalizados e filtragem por categoria.",k:"Defender for Endpoint web content filtering"},
+{d:2,q:"Você quer impedir que aplicativos não confiáveis alterem arquivos nas pastas Documentos e Imagens, como proteção contra ransomware. O que habilitar?",o:["Acesso controlado a pastas (controlled folder access)","Device control","Tamper protection","Isolamento seletivo"],a:[0],e:"O acesso controlado a pastas permite que só aplicativos confiáveis modifiquem as pastas protegidas.",c:"É um recurso de redução da superfície de ataque, com modo de auditoria para testar antes de bloquear.",k:"acesso controlado a pastas Defender"},
+{d:2,q:"Você precisa impedir a gravação de dados em pendrives USB, exceto em modelos aprovados pela empresa. O que configurar?",o:["Device control (controle de dispositivos) do Defender for Endpoint","Web content filtering","Uma política anti-spam","Safe Attachments"],a:[0],e:"O device control define políticas de leitura, gravação e execução para mídias removíveis, com exceções por ID de fabricante ou produto e por número de série.",c:"Combine o device control com o Purview DLP quando o objetivo for proteger dados sensíveis.",k:"Defender for Endpoint device control armazenamento removível"},
+{d:2,q:"Atacantes enviam e-mails fingindo ser o CEO, usando domínios parecidos e o nome dele. Qual configuração do Defender for Office 365 ajuda mais?",o:["Proteção contra representação de usuário na política anti-phishing, incluindo o CEO","Safe Attachments com entrega dinâmica","Uma regra ASR","Bloquear todos os domínios externos"],a:[0],e:"A proteção contra representação (usuários e domínios) identifica remetentes que imitam pessoas ou domínios protegidos e aplica ações como quarentena.",c:"Spoofing usa o seu domínio exato; impersonation (representação) usa nomes ou domínios parecidos.",k:"Defender for Office 365 proteção contra representação"},
+{d:2,q:"Você quer medir quantos funcionários clicam em links de phishing e inscrevê-los automaticamente em treinamento. Qual recurso usar?",o:["Treinamento de simulação de ataque (Attack simulation training)","Threat Explorer","Zero-hour auto purge","Alert tuning"],a:[0],e:"O Attack simulation training (MDO Plano 2) cria campanhas simuladas de phishing, mede os resultados e atribui treinamentos.",c:"Pessoas fazem parte da defesa: simulação, métricas e treinamento contínuo.",k:"Attack simulation training Defender for Office 365"},
+{d:2,q:"Você quer descobrir quais apps de nuvem não autorizados (shadow IT) os funcionários usam, sem instalar nada novo nos dispositivos já integrados ao MDE. O que fazer?",o:["Habilitar a integração do Defender for Endpoint com o Cloud Discovery do Defender for Cloud Apps","Criar uma política de sessão","Instalar o sensor do Defender for Identity","Configurar o Safe Links"],a:[0],e:"Com a integração, o MDE envia os dados de tráfego para o Cloud Discovery, que identifica os apps usados. Também é possível enviar logs de firewall ou proxy.",c:"Cloud Discovery = descobrir. Sancionar ou não sancionar = governar. Políticas = controlar.",k:"Defender for Cloud Apps Cloud Discovery integração Defender for Endpoint"},
+{d:2,q:"Qual tipo de detecção do Defender for Cloud Apps alerta quando um usuário faz login de dois países distantes em um intervalo impossível de percorrer?",o:["Política de detecção de anomalias (Impossible travel)","Política de sessão","Política de arquivo","Política de acesso"],a:[0],e:"As políticas de detecção de anomalias (como Impossible travel, atividade de país incomum e downloads em massa) vêm prontas e usam perfis de comportamento.",c:"As anomalias precisam de um período de aprendizado para formar a linha de base de cada usuário.",k:"Defender for Cloud Apps detecção de anomalias viagem impossível"},
+{d:2,q:"Você quer gerar alertas no Sentinel sempre que os logs tiverem indicadores conhecidos da inteligência de ameaças da própria Microsoft, sem escrever consultas. O que habilitar?",o:["A regra de análise Microsoft Defender Threat Intelligence Analytics","Uma watchlist com IPs","Um search job diário","Um notebook"],a:[0],e:"Essa regra pronta compara os logs (CEF, DNS, Syslog etc.) com os indicadores da Microsoft e gera alertas de alta fidelidade.",c:"Também existem regras de correspondência para os seus próprios indicadores (TI map).",k:"Microsoft Sentinel threat intelligence analytics regra"},
+{d:2,q:"Qual é o período máximo de consulta (lookback) de uma regra de análise agendada no Sentinel?",o:["14 dias","24 horas","90 dias","1 ano"],a:[0],e:"A regra agendada consulta no máximo 14 dias de dados, e a frequência pode ir de 5 minutos a 14 dias.",c:"Para padrões mais longos, use hunting, search jobs ou tabelas resumidas.",k:"Microsoft Sentinel regra agendada período de consulta"},
+{d:2,q:"Você quer que o título do alerta de uma regra agendada mostre o nome do usuário envolvido, por exemplo \"Login suspeito de ana@empresa.com\". O que configurar?",o:["Personalização dos detalhes do alerta (alert details) com o parâmetro <code>{{UserPrincipalName}}</code>","Uma watchlist","O agrupamento de eventos","Uma regra de automação que renomeia o incidente"],a:[0],e:"Nos detalhes do alerta, o formato do nome e da descrição aceita colunas do resultado entre chaves duplas, gerando títulos dinâmicos.",c:"Também dá para sobrescrever severidade, táticas e técnicas com valores vindos da consulta.",k:"Microsoft Sentinel personalizar detalhes do alerta"},
+{d:2,q:"Usuários enviam arquivos para uma conta de armazenamento por um portal público. Você quer verificar cada blob enviado em busca de malware. O que habilitar?",o:["Defender for Storage com verificação de malware no upload","Defender for Key Vault","Defender CSPM","Safe Attachments"],a:[0],e:"A verificação de malware do Defender for Storage analisa os blobs no momento do upload e pode acionar automações, como mover o arquivo para quarentena.",c:"O Defender for Storage também detecta acessos anômalos e exfiltração de dados.",k:"Defender for Storage verificação de malware"},
+{d:2,q:"Você quer avaliar vulnerabilidades das imagens no Azure Container Registry e detectar ameaças em tempo de execução no AKS. Qual plano habilitar?",o:["Defender for Containers","Defender for Servers","Defender for App Service","Defender for Storage"],a:[0],e:"O Defender for Containers cobre a avaliação de vulnerabilidades de imagens, a postura do Kubernetes e a proteção em tempo de execução dos clusters.",c:"Cadeia de contêiner: registro (imagens), cluster (postura) e execução (runtime).",k:"Defender for Containers"},
+{d:2,q:"Um atacante usa uma conta comum para pedir a replicação do AD e obter os hashes de senha de todos os usuários. Qual alerta do Defender for Identity indica isso?",o:["Suspected DCSync attack (replication of directory services)","Suspected brute-force attack (LDAP)","Impossible travel","Mass download"],a:[0],e:"O DCSync imita um controlador de domínio pedindo replicação. O MDI alerta quando essa solicitação vem de uma máquina que não é DC.",c:"Outros alertas clássicos do MDI: pass-the-hash, pass-the-ticket, Kerberoasting, Golden Ticket, reconhecimento por LDAP e SMB.",k:"Defender for Identity DCSync alerta"},
+{d:2,q:"Você quer exigir MFA apenas quando um login for considerado de risco médio ou alto pelo Entra ID Protection. O que configurar?",o:["Uma política de Conditional Access com a condição de risco de entrada (sign-in risk)","Uma política de risco de usuário que bloqueia sempre","Security defaults","Uma regra ASR"],a:[0],e:"A condição de sign-in risk no Conditional Access permite exigir MFA nos logins arriscados. O risco de usuário trata credenciais comprometidas e costuma exigir troca de senha.",c:"Sign-in risk = este login é suspeito. User risk = esta conta provavelmente está comprometida.",k:"Conditional Access risco de entrada MFA"},
+
+/* ===== Lote 3 — Domínio 3 ===== */
+{d:3,q:"Depois de investigar, você conclui que o incidente foi causado por um teste de intrusão autorizado. Qual classificação usar no Defender XDR?",o:["Atividade informativa e esperada (Informational, expected activity)","Verdadeiro positivo","Falso positivo","Não definido"],a:[0],e:"Testes autorizados e atividades legítimas que dispararam detecções corretamente são \"informativa e esperada\". Falso positivo é quando a detecção estava errada.",c:"Classificar bem melhora as detecções e as métricas do SOC.",k:"Defender XDR classificar incidentes"},
+{d:3,q:"Durante a análise, você percebe que um alerta de outro incidente faz parte do mesmo ataque. O que fazer no portal do Defender?",o:["Vincular o alerta ao incidente atual (Link alert to another incident)","Excluir o outro incidente","Criar uma regra de automação","Reclassificar como falso positivo"],a:[0],e:"O Defender correlaciona alertas automaticamente, mas você pode mover ou vincular um alerta a outro incidente manualmente.",c:"Um incidente deve representar um ataque inteiro, para dar a visão completa da cadeia.",k:"Defender XDR vincular alerta a incidente"},
+{d:3,q:"No Sentinel, você quer explorar visualmente as entidades de um incidente e expandir para alertas e atividades relacionados. O que usar?",o:["O gráfico de investigação (investigation graph)","Um workbook","Content hub","Watchlists"],a:[0],e:"O gráfico de investigação mostra as entidades mapeadas e permite expandir consultas de exploração para ver alertas e atividades relacionados.",c:"Sem mapeamento de entidades, o gráfico fica vazio.",k:"Microsoft Sentinel gráfico de investigação"},
+{d:3,q:"Você quer ver, em uma página só, a linha do tempo, os alertas e os insights de comportamento de um usuário envolvido em vários incidentes. O que abrir?",o:["A página da entidade (entity page) do usuário","O Content hub","A página de conectores de dados","O Secure Score"],a:[0],e:"A página da entidade reúne os alertas, a linha do tempo de atividades e os insights do UEBA sobre aquela conta, host ou IP.",c:"Comece pela entidade quando a pergunta for \"o que mais essa conta ou máquina fez?\".",k:"Microsoft Sentinel páginas de entidade"},
+{d:3,q:"Você quer executar um arquivo suspeito em um ambiente isolado na nuvem e obter um relatório de comportamento (processos, rede, registro). Qual recurso usar?",o:["Análise profunda (deep analysis) do arquivo no Defender for Endpoint","Collect investigation package","Run antivirus scan","Restringir execução de aplicativos"],a:[0],e:"A deep analysis detona o arquivo em sandbox e gera um relatório com os comportamentos observados.",c:"Na página do arquivo também aparecem a prevalência global e na organização, e os dispositivos onde ele foi visto.",k:"Defender for Endpoint análise profunda de arquivo"},
+{d:3,q:"Você quer executar um script PowerShell próprio, não assinado, em uma sessão de live response. O que é necessário? <b>(Escolha duas)</b>",o:["Fazer o upload do script para a biblioteca do live response","Habilitar o recurso avançado de execução de scripts não assinados no live response","Isolar o dispositivo antes","Instalar o Azure Monitor Agent"],a:[0,1],e:"O comando <code>run</code> só executa scripts da biblioteca. Scripts sem assinatura exigem o recurso avançado específico habilitado.",c:"Live response tem dois níveis: básico (leitura, coleta) e avançado (upload, run, remediação).",k:"Defender for Endpoint live response executar script"},
+{d:3,q:"Um e-mail claramente malicioso não foi detectado pelo Defender for Office 365. Como informar à Microsoft para melhorar a detecção?",o:["Enviar a mensagem pela página Envios (Submissions) do portal do Defender","Abrir um alerta no Sentinel","Criar uma regra ASR","Usar o live response"],a:[0],e:"A página Envios permite enviar e-mails, URLs e anexos à Microsoft como falsos negativos ou falsos positivos. Também dá para criar entradas de bloqueio na Tenant Allow/Block List.",c:"O botão de reportar mensagem no Outlook também alimenta a página Envios.",k:"Defender for Office 365 envios submissions"},
+{d:3,q:"Você quer que, quando um usuário reportar um e-mail como phishing, uma investigação automática encontre e sugira remover as mensagens semelhantes. Qual recurso faz isso?",o:["Investigação e resposta automatizadas (AIR) do Defender for Office 365 Plano 2","Safe Links","Mail flow rule","Content hub"],a:[0],e:"A AIR do MDO P2 é disparada por e-mails reportados e por alertas, busca mensagens semelhantes e propõe ações (como soft delete), que aparecem no Action center.",c:"Mesmo modelo de aprovação da AIR do Defender for Endpoint: as ações pendentes ficam no Action center.",k:"Defender for Office 365 investigação automatizada AIR"},
+{d:3,q:"Um app OAuth malicioso recebeu consentimento de usuários para ler e-mails (Mail.Read). Qual é a ação mais efetiva para cortar o acesso dele?",o:["Desabilitar ou banir o app no Defender for Cloud Apps (app governance) e revogar as permissões concedidas","Redefinir a senha dos usuários e nada mais","Isolar os notebooks dos usuários","Bloquear o domínio do remetente no Exchange"],a:[0],e:"Tokens OAuth continuam válidos mesmo após a troca de senha. É preciso desabilitar o app e revogar o consentimento. O app governance e o Entra ID permitem fazer isso.",c:"Ataques de consentimento ilícito exploram permissões concedidas, não senhas.",k:"app governance desabilitar app OAuth"},
+{d:3,q:"A senha de um usuário comprometido foi redefinida, mas o atacante ainda tem sessões abertas. O que fazer em seguida no Entra ID?",o:["Revogar as sessões do usuário (Revoke sessions)","Desabilitar o MFA","Remover a licença do Microsoft 365","Excluir o dispositivo do Intune"],a:[0],e:"Revogar as sessões invalida os tokens de atualização, forçando um novo login em todos os apps.",c:"Contenção de conta: redefinir a senha, revogar sessões, revisar métodos de MFA e regras de caixa de correio.",k:"Entra ID revogar sessões do usuário"},
+{d:3,q:"Você quer executar um playbook manualmente sobre um endereço IP, a partir da página da entidade ou do gráfico de investigação. Qual gatilho o playbook deve usar?",o:["Gatilho de entidade (Microsoft Sentinel entity)","Gatilho de incidente","Gatilho de alerta","Gatilho de recorrência"],a:[0],e:"Playbooks com gatilho de entidade podem ser executados sob demanda sobre uma entidade específica (IP, conta, host, URL…).",c:"Gatilhos do Sentinel para Logic Apps: incidente, alerta e entidade.",k:"Microsoft Sentinel playbook gatilho de entidade"},
+{d:3,q:"Durante um incidente, qual recurso do Security Copilot no portal do Defender sugere as próximas ações de triagem, contenção e remediação?",o:["Guided response (resposta guiada)","Script analysis","Secure Score","Threat analytics"],a:[0],e:"A resposta guiada recomenda ações com base no incidente, como isolar o dispositivo ou classificar o incidente, e permite executá-las direto da sugestão.",c:"Copilot no Defender: resumo do incidente, resposta guiada, análise de script e arquivo, KQL em linguagem natural e relatório do incidente.",k:"Security Copilot resposta guiada Defender"},
+{d:3,q:"Você precisa ver tudo o que aconteceu em um dispositivo (processos, conexões, arquivos, registro) nos minutos antes e depois de um alerta. Onde ver isso?",o:["Na linha do tempo do dispositivo (device timeline) no Defender for Endpoint","No Secure Score","Em Envios","No Content hub"],a:[0],e:"A linha do tempo do dispositivo mostra os eventos em ordem cronológica, com filtros e a opção de marcar eventos e ver a árvore de processos.",c:"A árvore de processos (quem iniciou quem) costuma revelar a cadeia do ataque.",k:"Defender for Endpoint linha do tempo do dispositivo"},
+
+/* ===== Lote 3 — Domínio 4 ===== */
+{d:4,q:"Você quer procurar o texto \"mimikatz\" em <b>todas</b> as tabelas do workspace, sem saber onde ele aparece. Qual operador usar?",o:["<code>search</code>","<code>where</code>","<code>project</code>","<code>join</code>"],a:[0],e:"<code>search \"mimikatz\"</code> procura em todas as tabelas e colunas. É útil para explorar, mas é caro: depois de descobrir a tabela, troque por <code>where</code>.",c:"search = exploração ampla; where = filtro preciso e eficiente.",k:"KQL operador search"},
+{d:4,q:"Em uma consulta longa, você quer definir uma vez a lista de IPs suspeitos e reutilizá-la em várias partes. Qual instrução usar?",o:["<code>let</code>","<code>extend</code>","<code>print</code>","<code>render</code>"],a:[0],e:"<code>let</code> cria variáveis, listas ou subconsultas reutilizáveis, como <code>let IPs = dynamic([\"1.2.3.4\",\"5.6.7.8\"]);</code>.",c:"Toda instrução let termina com ponto e vírgula, e a consulta principal vem depois.",k:"KQL instrução let"},
+{d:4,q:"Você quer detectar picos incomuns de logins por usuário ao longo de 14 dias, usando uma função de detecção de anomalias em séries temporais. Qual combinação usar?",o:["<code>make-series</code> + <code>series_decompose_anomalies()</code>","<code>summarize</code> + <code>take</code>","<code>join</code> + <code>union</code>","<code>parse_json</code> + <code>mv-expand</code>"],a:[0],e:"<code>make-series</code> cria a série com intervalos regulares (preenchendo zeros) e <code>series_decompose_anomalies()</code> marca os pontos fora do padrão.",c:"Séries temporais em KQL: make-series, series_decompose_anomalies, series_fit_line, render timechart.",k:"KQL make-series series_decompose_anomalies"},
+{d:4,q:"Você quer listar os eventos de regras ASR em modo auditoria no advanced hunting. Qual tabela e filtro usar?",o:["<code>DeviceEvents</code> com <code>ActionType startswith \"Asr\"</code>","<code>DeviceProcessEvents</code> com <code>FileName == \"asr.exe\"</code>","<code>AlertInfo</code> com <code>Title has \"ASR\"</code>","<code>DeviceInfo</code> com <code>OSPlatform == \"ASR\"</code>"],a:[0],e:"Os eventos das regras ASR (auditados e bloqueados) ficam em <code>DeviceEvents</code>, com ActionType como <code>AsrOfficeChildProcessAudited</code>.",c:"DeviceEvents guarda eventos diversos: ASR, detecções de antivírus, Exploit Protection, eventos de USB e outros.",k:"advanced hunting DeviceEvents ASR ActionType"},
+{d:4,q:"Você quer listar os alertas dos últimos 7 dias junto com os dispositivos e arquivos envolvidos em cada um. Quais tabelas combinar?",o:["<code>AlertInfo</code> e <code>AlertEvidence</code>, unidas por <code>AlertId</code>","<code>EmailEvents</code> e <code>DeviceInfo</code>","<code>SigninLogs</code> e <code>AuditLogs</code>","<code>Heartbeat</code> e <code>Usage</code>"],a:[0],e:"<code>AlertInfo</code> tem os dados do alerta (título, severidade, fonte) e <code>AlertEvidence</code> tem as entidades envolvidas (dispositivos, arquivos, contas, IPs).",c:"Um alerta tem várias evidências: join de 1 para muitos.",k:"advanced hunting AlertInfo AlertEvidence"},
+{d:4,q:"Você quer enriquecer resultados do advanced hunting com a prevalência global, o assinante e a reputação de arquivos pelo hash. Qual função usar?",o:["<code>FileProfile()</code>","<code>DeviceFromIP()</code>","<code>parse_json()</code>","<code>geo_info_from_ip_address()</code>"],a:[0],e:"<code>FileProfile()</code> recebe SHA1 ou SHA256 e acrescenta colunas como GlobalPrevalence, Signer, IsCertificateValid e ThreatName.",c:"Arquivos com prevalência global muito baixa costumam merecer investigação.",k:"advanced hunting FileProfile função"},
+{d:4,q:"Por quanto tempo os dados ficam disponíveis no advanced hunting do Defender XDR (sem Sentinel)?",o:["30 dias","7 dias","180 dias","2 anos"],a:[0],e:"O advanced hunting mantém até 30 dias de dados brutos. Para guardar por mais tempo, envie as tabelas para o Sentinel ou para um workspace.",c:"Retenção longa e correlação com fontes de terceiros = Sentinel.",k:"advanced hunting retenção de dados 30 dias"},
+{d:4,q:"Durante o hunting, você quer ver informações de um domínio suspeito, como WHOIS, histórico de DNS passivo, certificados e artigos de inteligência relacionados. O que usar?",o:["Microsoft Defender Threat Intelligence (perfis de host e intel)","Secure Score","Device timeline","Action center"],a:[0],e:"A threat intelligence da Microsoft no portal do Defender oferece dados de infraestrutura (WHOIS, DNS passivo, certificados) e perfis de atores e ferramentas.",c:"Pivotar pela infraestrutura do atacante revela outros domínios e IPs relacionados.",k:"Microsoft Defender Threat Intelligence"},
+
+/* ===== Lote 3 — Telas simuladas ===== */
+{d:4,scr:{cap:"Advanced hunting · consulta e resultado",html:`<div class="kql">DeviceInfo
+| where Timestamp > ago(1d)
+| summarize arg_max(Timestamp, *) by DeviceId
+| project DeviceName, OSPlatform, PublicIP</div>
+<table><tr><th>DeviceName</th><th>OSPlatform</th><th>PublicIP</th></tr><tr><td>nb-fin-017</td><td>Windows11</td><td>198.51.100.10</td></tr><tr><td>srv-app-01</td><td>WindowsServer2022</td><td>198.51.100.11</td></tr><tr><td>mac-design-03</td><td>macOS</td><td>198.51.100.10</td></tr></table>`},
+ q:"Por que a consulta da tela usa <code>arg_max(Timestamp, *)</code>?",o:["Para retornar só o registro mais recente de cada dispositivo, com todas as colunas","Para somar os horários","Para retornar o dispositivo com o maior número de eventos","Para ordenar os resultados por nome"],a:[0],
+ e:"A tabela DeviceInfo recebe vários registros por dispositivo. <code>arg_max(Timestamp, *) by DeviceId</code> mantém, para cada DeviceId, a linha com o maior Timestamp e todas as suas colunas.",
+ c:"arg_max/arg_min = a linha inteira do valor máximo ou mínimo por grupo. É o padrão para pegar o \"estado atual\".",k:"KQL arg_max"},
+
+{d:3,scr:{cap:"Portal do Defender · Incidente 4182 · Alertas",html:`<table><tr><th>Hora</th><th>Fonte</th><th>Alerta</th><th>Entidade</th></tr>
+<tr><td>08:02</td><td>Defender for Office 365</td><td>E-mail com anexo malicioso entregue</td><td>ana@luminavarejo.example</td></tr>
+<tr><td>08:15</td><td>Defender for Endpoint</td><td>Documento do Office iniciou processo suspeito</td><td>nb-fin-017</td></tr>
+<tr><td>08:31</td><td>Defender for Endpoint</td><td>Acesso suspeito à memória do LSASS</td><td>nb-fin-017</td></tr>
+<tr><td>08:47</td><td>Defender for Identity</td><td>Suspeita de pass-the-hash</td><td>srv-file-01</td></tr></table>`},
+ q:"Com base nos alertas do incidente, qual foi o vetor de acesso inicial?",o:["E-mail de phishing com anexo malicioso","Pass-the-hash contra srv-file-01","Força bruta em RDP","Exploração de vulnerabilidade no servidor de arquivos"],a:[0],
+ e:"Em ordem: e-mail com anexo (acesso inicial) → documento iniciando processo (execução) → acesso ao LSASS (roubo de credenciais) → pass-the-hash (movimento lateral). O primeiro passo é o e-mail.",
+ c:"Ler um incidente multiestágio é montar a cadeia: acesso inicial, execução, credenciais, movimento lateral e objetivo.",k:"Defender XDR incidentes multiestágio"},
+
+{d:3,scr:{cap:"Defender for Endpoint · nb-fin-017 · Linha do tempo",html:`<table><tr><th>Hora</th><th>Evento</th></tr>
+<tr><td>10:01:12</td><td>winword.exe criou o processo powershell.exe -enc SQBFAFgA…</td></tr>
+<tr><td>10:01:15</td><td>powershell.exe conectou-se a 198.51.100.23:443</td></tr>
+<tr><td>10:02:40</td><td>powershell.exe criou o arquivo C:\\Users\\Public\\svc.exe</td></tr>
+<tr><td>10:03:05</td><td>schtasks.exe /create /tn "Atualizador" /tr C:\\Users\\Public\\svc.exe /sc onlogon</td></tr></table>`},
+ q:"Qual evento da linha do tempo representa a técnica de <b>persistência</b>?",o:["A criação da tarefa agendada com schtasks.exe para rodar no logon","O winword.exe criando o powershell.exe","A conexão com 198.51.100.23:443","A criação do arquivo svc.exe"],a:[0],
+ e:"Uma tarefa agendada que executa o malware a cada logon garante que ele volte após reinicializações: é persistência (MITRE T1053.005). Os outros eventos são execução, comando e controle e download do payload.",
+ c:"Locais comuns de persistência: tarefas agendadas, chaves Run do registro, serviços e a pasta Inicializar.",k:"MITRE ATT&CK persistência tarefa agendada"},
+
+{d:1,scr:{cap:"Defender for Cloud · Recomendação",html:`<div class="sgrid"><span>Recomendação</span><span><b>As portas de gerenciamento das máquinas virtuais devem ser protegidas com controle de acesso de rede just-in-time</b></span><span>Severidade</span><span><span class="sbadge r">Alta</span></span><span>Recursos afetados</span><span>vm-web-01, vm-web-02, vm-app-03</span><span>Portas abertas</span><span>3389 (RDP), 22 (SSH) para 0.0.0.0/0</span></div>`},
+ q:"Qual é a forma recomendada de corrigir a recomendação mostrada na tela, mantendo o acesso administrativo quando necessário?",o:["Habilitar o acesso JIT às VMs, que mantém as portas fechadas e as abre sob demanda","Isolar as VMs no Defender for Endpoint","Excluir as VMs","Criar uma regra ASR"],a:[0],
+ e:"O JIT altera o NSG para negar as portas por padrão e abre temporariamente só para o IP de quem pediu, com registro de auditoria.",
+ c:"Portas de gerenciamento abertas para a internet estão entre os vetores mais explorados em nuvem.",k:"Defender for Cloud just-in-time VM"},
+
+{d:3,scr:{cap:"Microsoft Entra ID Protection · Usuários arriscados",html:`<table><tr><th>Usuário</th><th>Nível de risco</th><th>Estado do risco</th><th>Detecção</th></tr>
+<tr><td>joao@tecnova.example</td><td><span class="sbadge r">Alto</span></td><td>Em risco</td><td>Credenciais vazadas</td></tr></table>`},
+ q:"Você quer que usuários na situação da tela corrijam o próprio risco automaticamente. Qual política configurar?",o:["Conditional Access com risco de usuário Alto → exigir alteração de senha (com MFA)","Conditional Access com risco de entrada Baixo → bloquear","Bloquear todos os logins fora do Brasil","Desabilitar o MFA para o usuário"],a:[0],
+ e:"Credenciais vazadas aumentam o risco do usuário. A remediação recomendada é exigir troca segura de senha (o usuário faz MFA e troca a senha), o que encerra o risco.",
+ c:"User risk → trocar a senha. Sign-in risk → exigir MFA.",k:"Conditional Access política de risco de usuário"},
+
+{d:2,scr:{cap:"Defender for Cloud Apps · Cloud Discovery · Apps descobertos",html:`<table><tr><th>App</th><th>Pontuação de risco</th><th>Usuários</th><th>Upload</th><th>Status</th></tr>
+<tr><td>ShareFast</td><td><span class="sbadge r">3/10</span></td><td>214</td><td>12,4 GB</td><td><span class="sbadge n">Nenhum</span></td></tr>
+<tr><td>Microsoft OneDrive</td><td><span class="sbadge g">10/10</span></td><td>1.870</td><td>310 GB</td><td><span class="sbadge g">Sancionado</span></td></tr></table>`},
+ q:"Você quer impedir o acesso ao app ShareFast nos dispositivos integrados ao Defender for Endpoint. O que fazer?",o:["Marcar o ShareFast como Não sancionado, com a integração do Defender for Endpoint habilitada","Marcar o OneDrive como Não sancionado","Criar uma regra ASR","Excluir o app da lista"],a:[0],
+ e:"Com a integração ativa, apps marcados como não sancionados viram indicadores de bloqueio no MDE, e a Network Protection impede o acesso nos dispositivos.",
+ c:"Fluxo de shadow IT: descobrir → avaliar o risco → sancionar ou não sancionar → bloquear ou monitorar.",k:"Defender for Cloud Apps bloquear app não sancionado"},
+
+{d:2,scr:{cap:"Microsoft Sentinel · Regra de análise · Mapeamento de entidades",html:`<table><tr><th>Tipo de entidade</th><th>Identificador</th><th>Coluna da consulta</th></tr>
+<tr><td>Account</td><td>FullName</td><td>UserPrincipalName</td></tr>
+<tr><td>IP</td><td>Address</td><td>IPAddress</td></tr>
+<tr><td>Host</td><td>HostName</td><td><span class="sbadge n">(não mapeado)</span></td></tr></table>
+<div class="note">A consulta retorna as colunas: TimeGenerated, UserPrincipalName, IPAddress, Computer.</div>`},
+ q:"Os incidentes dessa regra mostram o usuário e o IP no gráfico de investigação, mas nunca a máquina. Como corrigir?",o:["Mapear a entidade Host usando a coluna Computer","Aumentar a frequência da regra","Habilitar o agrupamento de alertas","Adicionar a regra a uma watchlist"],a:[0],
+ e:"Só aparecem no incidente as entidades mapeadas. A consulta já retorna a coluna <code>Computer</code>; basta mapeá-la ao identificador HostName da entidade Host.",
+ c:"Entidades não mapeadas não são correlacionadas, não aparecem no gráfico e não podem ser usadas em automações.",k:"Microsoft Sentinel mapeamento de entidades Host"},
+
+{d:4,scr:{cap:"Advanced hunting · resultados de duas consultas",html:`<div class="note">EmailEvents — campanha de phishing</div>
+<table><tr><th>RecipientEmailAddress</th><th>ThreatTypes</th><th>DeliveryAction</th></tr>
+<tr><td>ana@lumina.example</td><td>Phish</td><td>Delivered</td></tr><tr><td>bruno@lumina.example</td><td>Phish</td><td>Delivered</td></tr><tr><td>carla@lumina.example</td><td>Phish</td><td>Delivered</td></tr><tr><td>diego@lumina.example</td><td>Phish</td><td>Delivered</td></tr></table>
+<div class="note">UrlClickEvents — cliques no link da campanha</div>
+<table><tr><th>AccountUpn</th><th>ActionType</th><th>IsClickedThrough</th></tr>
+<tr><td>carla@lumina.example</td><td>ClickAllowed</td><td>true</td></tr><tr><td>diego@lumina.example</td><td>ClickBlocked</td><td>false</td></tr></table>`},
+ q:"Além de remover os e-mails das quatro caixas, qual usuário deve ser priorizado para redefinição de senha e revogação de sessões?",o:["carla","diego","Todos os quatro destinatários","Nenhum, porque o e-mail será removido"],a:[0],
+ e:"Só a carla chegou ao site (<code>ClickAllowed</code>, <code>IsClickedThrough = true</code>), então pode ter digitado credenciais. O clique de diego foi bloqueado pelo Safe Links. Os quatro recebem a remoção do e-mail.",
+ c:"Escopo do incidente de phishing: quem recebeu (EmailEvents) → quem clicou (UrlClickEvents) → quem logou de lugares estranhos depois (SigninLogs).",k:"UrlClickEvents ActionType ClickAllowed"},
+
+/* ===== Lote 3 — Hotspot ===== */
+{d:4,t:"hot",
+ q:"Complete a consulta para listar usuários com mais de 10 falhas de login que também tiveram pelo menos um login bem-sucedido.",
+ tpl:`<pre>SigninLogs
+| where TimeGenerated > ago(1d)
+| summarize Falhas = {{0}}(ResultType != "0"),
+            Sucessos = countif(ResultType == "0") by UserPrincipalName
+| where Falhas > 10 and Sucessos {{1}} 0</pre>`,
+ opts:[["countif","count","dcount","sum"],[">","<","==","!="]],a:[0,0],
+ e:"<code>countif(condição)</code> conta só as linhas que atendem à condição. Assim falhas e sucessos saem no mesmo <code>summarize</code>. <code>Sucessos > 0</code> mantém quem teve ao menos um sucesso, um sinal de senha descoberta.",
+ c:"Muitas falhas seguidas de um sucesso é o padrão clássico de força bruta ou password spray bem-sucedido.",k:"KQL countif"},
+
+{d:4,t:"hot",
+ q:"Complete a consulta para obter o estado mais recente de cada dispositivo e exibir só o nome e o sistema operacional.",
+ tpl:`<pre>DeviceInfo
+| summarize {{0}}(Timestamp, *) by DeviceId
+| {{1}} DeviceName, OSPlatform</pre>`,
+ opts:[["arg_max","max","make_set","take_any"],["project","extend","summarize","where"]],a:[0,0],
+ e:"<code>arg_max(Timestamp, *)</code> retorna a linha completa mais recente por dispositivo. <code>max(Timestamp)</code> traria só a data. <code>project</code> escolhe as colunas exibidas.",
+ c:"max() devolve o valor; arg_max() devolve a linha.",k:"KQL arg_max project"},
+
+{d:4,t:"hot",
+ q:"A coluna <code>Entities</code> da tabela SecurityAlert contém um array JSON. Complete a consulta para obter uma linha por endereço IP envolvido nos alertas.",
+ tpl:`<pre>SecurityAlert
+| extend Ents = parse_json(Entities)
+| {{0}} Ents
+| where Ents.Type == "ip"
+| {{1}} IP = tostring(Ents.Address)</pre>`,
+ opts:[["mv-expand","summarize","join","project"],["extend","summarize","render","distinct"]],a:[0,0],
+ e:"<code>mv-expand</code> transforma cada elemento do array em uma linha. Depois, <code>extend</code> cria a coluna IP a partir da propriedade Address.",
+ c:"Arrays em colunas dinâmicas → mv-expand. Objetos JSON → parse_json + acesso por ponto.",k:"KQL mv-expand"},
+
+{d:3,t:"hot",
+ q:"Selecione a ação adequada do Defender for Endpoint para cada necessidade.",
+ tpl:`<p>Impedir conexões ao domínio <code>malicioso.example</code> em todos os dispositivos: {{0}}.</p><p>Impedir que um executável específico rode em qualquer dispositivo e remover as cópias existentes: {{1}}.</p>`,
+ opts:[["Indicador de URL/domínio com ação Bloquear","Isolar todos os dispositivos","Uma regra ASR","Uma categoria no web content filtering"],["Indicador de hash do arquivo com ação Block and remediate","Executar verificação antivírus completa","Restringir execução de aplicativos em todos os dispositivos","Coletar pacote de investigação"]],a:[0,0],
+ e:"Indicadores são a forma direcionada de bloquear um IoC específico: domínio (com Network Protection) ou hash de arquivo. Isolar ou restringir todos os dispositivos seria desproporcional.",
+ c:"IoC específico → indicador. Categoria de sites → web content filtering. Comportamento genérico → ASR.",k:"Defender for Endpoint indicadores"},
+
+{d:2,t:"hot",
+ q:"Selecione o plano ou recurso do Defender for Cloud que atende a cada necessidade.",
+ tpl:`<p>Receber alertas quando arquivos com malware forem enviados para contas de armazenamento: {{0}}.</p><p>Reduzir a exposição de RDP e SSH das VMs sem perder o acesso administrativo: {{1}}.</p>`,
+ opts:[["Defender for Storage com verificação de malware","Defender for Key Vault","Defender CSPM","Defender for App Service"],["Acesso just-in-time às VMs","Defender for Containers","Workflow automation","Continuous export"]],a:[0,0],
+ e:"A verificação de malware no upload é do Defender for Storage. O JIT, do Defender for Servers P2, controla as portas de gerenciamento.",
+ c:"Associe cada plano ao tipo de recurso que ele protege.",k:"Defender for Cloud planos"},
+
+{d:3,t:"hot",
+ q:"Configure a automação do Sentinel para os dois cenários.",
+ tpl:`<p>Executar um playbook manualmente sobre um IP, a partir da página da entidade: o playbook usa o gatilho {{0}}.</p><p>Executar um playbook automaticamente em todo incidente novo: o playbook usa o gatilho de incidente e é chamado por {{1}}.</p>`,
+ opts:[["de entidade","de incidente","de alerta","de recorrência"],["uma regra de automação","uma regra de análise","um workbook","uma watchlist"]],a:[0,0],
+ e:"Playbooks com gatilho de entidade rodam sob demanda sobre uma entidade. Para execução automática em incidentes, o playbook usa o gatilho de incidente e é chamado por uma regra de automação.",
+ c:"Regras de análise não chamam playbooks com gatilho de incidente diretamente; isso é papel das regras de automação.",k:"Microsoft Sentinel gatilhos de playbook"},
+
+{d:4,t:"hot",
+ q:"Complete a consulta para criar uma série temporal de logins por hora e marcar anomalias.",
+ tpl:`<pre>SigninLogs
+| {{0}} Logins = count() default = 0 on TimeGenerated from ago(14d) to now() step 1h by UserPrincipalName
+| extend (Anomalias, Pontuacao, Base) = {{1}}(Logins)</pre>`,
+ opts:[["make-series","summarize","render","bin"],["series_decompose_anomalies","series_fit_line","make_list","percentile"]],a:[0,0],
+ e:"A sintaxe <code>... on TimeGenerated from ... to ... step ...</code> é do <code>make-series</code>. <code>series_decompose_anomalies</code> devolve as anomalias (-1, 0, 1), a pontuação e a linha de base.",
+ c:"make-series preenche os intervalos vazios com default = 0, o que é essencial para detectar anomalias corretamente.",k:"KQL make-series anomalias"},
+
+{d:2,t:"hot",
+ q:"Selecione o controle de acesso adequado para cada nível de risco no Entra ID Protection.",
+ tpl:`<p>Usuário com risco <b>Alto</b>: {{0}}.</p><p>Login com risco <b>Médio ou Alto</b>: {{1}}.</p>`,
+ opts:[["Exigir alteração de senha (com MFA)","Exigir MFA apenas","Permitir sem controles","Exigir dispositivo em conformidade"],["Exigir MFA","Exigir alteração de senha","Bloquear sempre, sem exceção","Permitir sem controles"]],a:[0,0],
+ e:"Pela recomendação da Microsoft, risco de usuário é tratado com troca segura de senha, e risco de entrada com MFA. Os dois são configurados como condições no Conditional Access.",
+ c:"Autorremediação reduz a carga do SOC: o próprio usuário resolve o risco com controles fortes.",k:"Entra ID Protection políticas de risco Conditional Access"},
+
+/* ===== Lote 3 — Arrastar e soltar ===== */
+{d:3,t:"drag",
+ q:"Associe cada objetivo à ação de resposta do Defender for Endpoint. Nem todas as ações serão usadas.",
+ targets:["Cortar a comunicação de rede, mantendo a conexão com o Defender","Permitir só a execução de aplicativos assinados pela Microsoft","Obter artefatos forenses do dispositivo","Executar um arquivo em sandbox e ver o comportamento"],
+ pool:["Isolar dispositivo","Restringir execução de aplicativos","Coletar pacote de investigação","Análise profunda (deep analysis)","Executar verificação antivírus","Adicionar indicador"],a:[0,1,2,3],
+ e:"Isolar → rede. Restringir execução → só apps assinados pela Microsoft. Pacote de investigação → forense. Deep analysis → sandbox. A verificação antivírus e os indicadores têm outros objetivos.",
+ c:"Decore a dupla ação → efeito: é a base das questões de resposta a incidentes.",k:"Defender for Endpoint ações de resposta"},
+
+{d:4,t:"drag",
+ q:"Monte a consulta para listar os 5 IPs com mais falhas de login nas últimas 24 horas. Coloque as linhas na ordem correta.",
+ targets:["Linha 1","Linha 2","Linha 3","Linha 4"],
+ pool:["SigninLogs","| where TimeGenerated > ago(1d) and ResultType != \"0\"","| summarize Falhas = count() by IPAddress","| top 5 by Falhas"],a:[0,1,2,3],
+ e:"Primeiro a tabela, depois o filtro de tempo e falhas, a agregação por IP e, por fim, os 5 maiores. O <code>top</code> precisa da coluna Falhas, que só existe depois do <code>summarize</code>.",
+ c:"Cada linha do KQL só enxerga as colunas produzidas pelas linhas anteriores.",k:"KQL summarize top"},
+
+{d:2,t:"drag",
+ q:"Associe cada necessidade ao plano do Defender for Cloud. Nem todos os planos serão usados.",
+ targets:["Acesso just-in-time e integração com o Defender for Endpoint nas VMs","Verificação de malware em blobs enviados","Vulnerabilidades em imagens do registro e alertas de runtime do Kubernetes","Análise de caminhos de ataque e cloud security explorer"],
+ pool:["Defender for Servers","Defender for Storage","Defender for Containers","Defender CSPM","Defender for Key Vault","Defender for App Service"],a:[0,1,2,3],
+ e:"Servers → VMs (JIT, MDE). Storage → malware em blobs. Containers → imagens e Kubernetes. Defender CSPM → caminhos de ataque.",
+ c:"CSPM = postura do ambiente. Os demais planos = proteção de cada tipo de carga.",k:"Defender for Cloud planos Defender"},
+
+{d:4,t:"drag",
+ q:"Associe cada função do KQL ao que ela retorna. Nem todas as funções serão usadas.",
+ targets:["A linha mais recente de cada grupo","A quantidade de valores distintos","Um array com valores distintos","A quantidade de linhas que atendem a uma condição"],
+ pool:["arg_max()","dcount()","make_set()","countif()","bin()","ago()"],a:[0,1,2,3],
+ e:"<code>arg_max()</code> → linha do valor máximo. <code>dcount()</code> → contagem distinta. <code>make_set()</code> → array distinto. <code>countif()</code> → contagem condicional. <code>bin()</code> arredonda valores e <code>ago()</code> calcula datas relativas.",
+ c:"Funções de agregação só funcionam dentro de summarize (ou make-series).",k:"KQL funções de agregação"},
+
+{d:2,t:"drag",
+ q:"Associe cada objetivo ao recurso do Defender for Office 365. Nem todos os recursos serão usados.",
+ targets:["Verificar URLs no momento do clique","Abrir anexos em sandbox antes da entrega","Remover e-mails maliciosos já entregues automaticamente","Simular campanhas de phishing para treinar usuários"],
+ pool:["Safe Links","Safe Attachments","Zero-hour auto purge (ZAP)","Attack simulation training","Política anti-spam","DKIM"],a:[0,1,2,3],
+ e:"Safe Links → clique. Safe Attachments → sandbox. ZAP → remoção depois da entrega. Attack simulation training → simulações. Anti-spam e DKIM tratam de outros problemas.",
+ c:"MDO protege antes da entrega (filtros, sandbox), no clique (Safe Links) e depois da entrega (ZAP, AIR).",k:"Defender for Office 365 recursos"},
+
+/* ===== Lote 3 — Sim / Não ===== */
+{d:4,t:"yn",q:"Sobre o advanced hunting do Defender XDR, selecione Sim se a afirmação for verdadeira ou Não se for falsa.",
+ s:["Os dados ficam disponíveis por até 30 dias.","Detecções personalizadas podem executar ações automáticas, como isolar o dispositivo.","O advanced hunting só consulta tabelas do Defender for Endpoint."],a:[true,true,false],
+ e:"O advanced hunting guarda 30 dias. Detecções personalizadas podem disparar ações (isolar, coletar pacote, colocar arquivo em quarentena etc.). As tabelas cobrem MDE, MDO, MDI, MDCA, alertas e outras fontes.",
+ c:"Uma tela para todos os sinais do XDR, com KQL.",k:"Defender XDR advanced hunting visão geral"},
+{d:2,t:"yn",q:"Sobre o Microsoft Defender for Identity, selecione Sim se a afirmação for verdadeira ou Não se for falsa.",
+ s:["O sensor deve ser instalado nos controladores de domínio.","O MDI pode detectar ataques de DCSync.","O MDI exige um agente em todas as estações de trabalho."],a:[true,true,false],
+ e:"O sensor vai em DCs (e AD FS, AD CS, Entra Connect). O DCSync é uma das detecções clássicas. Estações de trabalho não recebem o sensor do MDI.",
+ c:"MDI = visão do Active Directory local.",k:"Defender for Identity visão geral"},
+{d:1,t:"yn",q:"Sobre o UEBA do Microsoft Sentinel, selecione Sim se a afirmação for verdadeira ou Não se for falsa.",
+ s:["O UEBA grava os resultados na tabela BehaviorAnalytics.","O UEBA usa fontes como os logs de login e auditoria do Entra ID.","Ao habilitar o UEBA, as regras de análise são desativadas."],a:[true,true,false],
+ e:"O UEBA grava em BehaviorAnalytics e usa fontes como SigninLogs, AuditLogs e SecurityEvent. Ele complementa as regras de análise; não as substitui nem as desativa.",
+ c:"UEBA = contexto e anomalias de comportamento para priorizar a investigação.",k:"Microsoft Sentinel UEBA fontes de dados"},
+{d:1,t:"yn",q:"Sobre proteção de endpoints, selecione Sim se a afirmação for verdadeira ou Não se for falsa.",
+ s:["O EDR em modo bloqueio remedia artefatos mesmo quando um antivírus de terceiros é o principal.","A proteção contra adulteração impede que malware desative o Defender Antivirus.","O EDR em modo bloqueio exige que o Defender Antivirus esteja em modo ativo."],a:[true,true,false],
+ e:"O EDR em modo bloqueio existe justamente para quando o Defender AV está em modo passivo. A proteção contra adulteração protege as configurações de segurança.",
+ c:"Modo passivo = o Defender AV não bloqueia sozinho; o EDR em modo bloqueio compensa.",k:"EDR em modo bloqueio requisitos"},
+{d:2,t:"yn",q:"Sobre o Defender for Cloud Apps, selecione Sim se a afirmação for verdadeira ou Não se for falsa.",
+ s:["O Cloud Discovery pode usar dados de tráfego do Defender for Endpoint.","Marcar um app como não sancionado pode bloqueá-lo nos dispositivos com MDE.","Políticas de sessão funcionam sem o Conditional Access App Control."],a:[true,true,false],
+ e:"A integração com o MDE alimenta o Cloud Discovery e permite bloquear apps não sancionados. Políticas de sessão exigem que a sessão passe pelo Conditional Access App Control.",
+ c:"Sessão em tempo real (bloquear download, copiar e colar) = Conditional Access App Control.",k:"Defender for Cloud Apps Conditional Access App Control"},
+{d:3,t:"yn",q:"Sobre playbooks do Microsoft Sentinel, selecione Sim se a afirmação for verdadeira ou Não se for falsa.",
+ s:["Playbooks são baseados em Azure Logic Apps.","Um playbook com gatilho de incidente pode ser executado por uma regra de automação.","Playbooks só podem ser executados automaticamente, nunca de forma manual."],a:[true,true,false],
+ e:"Playbooks são Logic Apps com gatilhos do Sentinel. Podem ser executados por regras de automação ou manualmente, a partir de um incidente, alerta ou entidade.",
+ c:"Manual = o analista decide na hora. Automático = regra de automação.",k:"Microsoft Sentinel playbooks"},
+
+/* ===== Lote 3 — Estudo de caso Tecnova ===== */
+{d:1,cs:"tecnova",q:"Para atender ao requisito T1, o que você deve usar?",
+ o:["Azure Lighthouse, delegando o acesso ao workspace para o tenant da Vigia SOC","Contas B2B convidadas para cada analista da Vigia SOC","Um segundo workspace do Sentinel no tenant da Vigia SOC, copiando os dados","Microsoft Entra Connect entre os dois tenants"],a:[0],
+ e:"O Azure Lighthouse permite que identidades do tenant do parceiro gerenciem recursos do cliente sem contas convidadas, exatamente como pede o T1.",
+ c:"\"Sem contas convidadas\" + \"a partir do próprio tenant\" = Azure Lighthouse.",k:"Azure Lighthouse Microsoft Sentinel"},
+{d:1,cs:"tecnova",q:"Para atender ao requisito T2 nos servidores locais, o que você deve fazer?",
+ o:["Integrar os servidores ao Azure Arc e habilitar o Defender for Servers na assinatura","Instalar só o sensor do Defender for Identity","Criar um conector Syslog","Habilitar o Defender for Storage"],a:[0],
+ e:"Servidores fora do Azure entram no Defender for Cloud pelo Azure Arc. Com o Defender for Servers habilitado, o MDE é implantado e eles aparecem no inventário e nas recomendações.",
+ c:"Fora do Azure (local, AWS, GCP) → Azure Arc ou conectores multicloud para entrar no Defender for Cloud.",k:"Azure Arc Defender for Servers servidores locais"},
+{d:1,cs:"tecnova",t:"hot",q:"Configure a coleta para atender ao requisito T3.",
+ tpl:`<p><b>Conector:</b> {{0}}</p><p><b>Conjunto de eventos:</b> {{1}}</p>`,
+ opts:[["Windows Security Events via AMA","Syslog via AMA","Common Event Format (CEF) via AMA","Windows Forwarded Events"],["Comum (Common)","Todos os eventos de segurança","Mínimo (Minimal)","Nenhum"]],a:[0,0],
+ e:"Eventos de segurança de servidores Windows vêm pelo conector Windows Security Events via AMA, que oferece os conjuntos All, Common, Minimal e Custom. O T3 pede o conjunto Common.",
+ c:"Common = trilha de auditoria completa com volume moderado. All = tudo. Minimal = só eventos que indicam ameaças.",k:"Windows Security Events via AMA conjuntos de eventos"},
+{d:3,cs:"tecnova",t:"yn",q:"Sobre os requisitos T4 e T5, selecione Sim se a afirmação for verdadeira ou Não se for falsa.",
+ s:["Configurar o grupo de dispositivos dos servidores críticos com \"Semi — require approval for any remediation\" atende ao T4.","Uma transformação na regra de coleta de dados pode remover a coluna EventData antes da ingestão, atendendo ao T5.","Para atender ao T5 é preciso um Logic App que apague a coluna depois que os dados forem gravados."],a:[true,true,false],
+ e:"O nível Semi com aprovação para qualquer remediação atende ao T4. Transformações na DCR removem colunas em trânsito (T5). Dados já gravados não podem ser editados por Logic App, e o custo de ingestão já teria sido cobrado.",
+ c:"Reduzir custo de ingestão = agir antes de gravar.",k:"transformação DCR remover coluna"},
+{d:1,cs:"tecnova",t:"drag",q:"Associe cada requisito da Tecnova ao recurso que o atende. Nem todos os recursos serão usados.",
+ targets:["T1 — SOC do parceiro a partir do próprio tenant","T2 — Servidores locais no Defender for Cloud e no MDE","T3 — Eventos de segurança dos DCs (conjunto Common)","T5 — Remover coluna antes de gravar"],
+ pool:["Azure Lighthouse","Azure Arc + Defender for Servers","Windows Security Events via AMA","Transformação na DCR","Contas B2B convidadas","Agente Log Analytics (MMA)","Plano Basic"],a:[0,1,2,3],
+ e:"T1 → Lighthouse. T2 → Arc + Defender for Servers. T3 → conector via AMA com o conjunto Common. T5 → transformação na DCR. Contas convidadas violam o T1, o MMA foi descontinuado e o plano Basic não remove colunas.",
+ c:"Elimine os distratores pelo requisito: \"sem convidados\", \"agente atual\", \"antes de gravar\".",k:"Microsoft Sentinel arquitetura multitenant AMA"}
 ];
 
-const KEY="sc200-treino-v1";
-const N=QUESTIONS.length;
-let state={cur:0,ans:{},mk:{},hint:{},view:"q"};
-try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.ans)state=Object.assign(state,s,{view:"q"});}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
-
-const $=id=>document.getElementById(id);
-const card=$("card");
-
-function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}
-function answeredCount(){return Object.values(state.ans).filter(a=>a.done).length;}
-
-function render(){
-  $("counter").textContent=`${state.cur+1}/${N} · ${answeredCount()} respondidas`;
-  renderGrid();
-  if(state.view==="r"){renderResult();return;}
-  const i=state.cur,Q=QUESTIONS[i],A=state.ans[i]||{},h=state.hint[i]||0;
-  card.innerHTML="";
-  card.appendChild(el("span","chip",Q.d));
-  card.appendChild(el("div","qnum","Questão "+(i+1)));
-  card.appendChild(el("p","qtext",Q.q));
-  const opts=el("div","opts");
-  Q.o.forEach((t,j)=>{
-    const b=el("button","opt");
-    const elim=h>=1&&Q.e.includes(j);
-    b.appendChild(el("span","letter","ABCD"[j]));
-    b.appendChild(Q.c?el("code",null,t):el("span",null,t));
-    if(A.done){
-      b.disabled=true;
-      if(j===Q.a)b.classList.add("correct");
-      else if(j===A.sel)b.classList.add("wrong");
-      else if(elim)b.classList.add("elim");
-    }else if(elim){b.classList.add("elim");b.disabled=true;}
-    else{
-      if(A.sel===j)b.classList.add("sel");
-      b.onclick=()=>select(j);
-    }
-    opts.appendChild(b);
-  });
-  card.appendChild(opts);
-
-  if(h>0){
-    const box=el("div","box hints");
-    box.appendChild(el("h4",null,"DICAS"));
-    box.appendChild(el("p",null,"Dica 1: 2 alternativas erradas foram eliminadas."));
-    if(h>=2)box.appendChild(el("p",null,"Dica 2 · conceito-chave: "+Q.k));
-    card.appendChild(box);
+const CASES = {
+  lumina: {
+    title: "Estudo de caso: Lumina Varejo",
+    html: `<p><b>Visão geral.</b> A Lumina Varejo tem 2.000 funcionários e escritórios em São Paulo e Recife.</p>
+<p><b>Ambiente atual.</b></p>
+<ul>
+<li>Microsoft 365 E5 para todos os usuários; identidade híbrida (AD local sincronizado com o Microsoft Entra ID).</li>
+<li>Quatro controladores de domínio (dois por escritório).</li>
+<li>Uma assinatura do Azure com 40 VMs Windows Server e 10 VMs Linux.</li>
+<li>Um workspace do Log Analytics chamado <code>law-lumina</code>, com o Microsoft Sentinel habilitado.</li>
+<li>Firewalls Palo Alto enviam logs CEF para um encaminhador Linux.</li>
+<li>A regra de análise “Login de executivo fora do país” já existe no Sentinel.</li>
+</ul>
+<p><b>Requisitos.</b></p>
+<ul>
+<li><b>R1:</b> Os incidentes do Defender XDR e do Sentinel devem ser gerenciados em uma única fila.</li>
+<li><b>R2:</b> Os analistas de nível 1 (N1) devem poder atribuir e fechar incidentes, mas não alterar regras de análise.</li>
+<li><b>R3:</b> Contas do AD local comprometidas devem ser desabilitadas pelo portal do Defender.</li>
+<li><b>R4:</b> Os logs de firewall devem ser guardados por 2 anos com o menor custo; consultas interativas são necessárias apenas nos últimos 90 dias.</li>
+<li><b>R5:</b> Incidentes da regra “Login de executivo fora do país” devem receber severidade Alta e ser atribuídos a Ana Souza (líder do N2) automaticamente.</li>
+<li><b>R6:</b> Minimizar o esforço administrativo.</li>
+</ul>`
+  },
+  tecnova: {
+    title: "Estudo de caso: Tecnova Saúde",
+    html: `<p><b>Visão geral.</b> A Tecnova Saúde é uma rede de clínicas com 5.000 funcionários. O SOC é terceirizado para a parceira <b>Vigia SOC</b>, que tem o próprio tenant do Microsoft Entra.</p>
+<p><b>Ambiente atual.</b></p>
+<ul>
+<li>Microsoft 365 E5; três assinaturas do Azure.</li>
+<li>300 servidores Windows (200 em datacenter local, 100 no Azure) e 50 servidores Linux.</li>
+<li>Seis controladores de domínio no datacenter local.</li>
+<li>Um workspace do Log Analytics com o Microsoft Sentinel habilitado.</li>
+<li>Alguns servidores ainda usam o agente legado do Log Analytics (MMA).</li>
+</ul>
+<p><b>Requisitos.</b></p>
+<ul>
+<li><b>T1:</b> A Vigia SOC deve gerenciar os incidentes do Sentinel da Tecnova a partir do próprio tenant, sem contas convidadas.</li>
+<li><b>T2:</b> Os servidores locais devem ser integrados ao Defender for Endpoint e aparecer no Defender for Cloud.</li>
+<li><b>T3:</b> Os eventos de segurança dos controladores de domínio devem ser enviados ao Sentinel usando o conjunto de eventos “Common”.</li>
+<li><b>T4:</b> Nos servidores críticos, qualquer remediação automática deve ser aprovada por um analista.</li>
+<li><b>T5:</b> A coluna EventData de eventos verbosos deve ser removida antes de os dados serem gravados no workspace.</li>
+<li><b>T6:</b> Minimizar custos.</li>
+</ul>`
   }
-  if(A.done){
-    const ok=A.sel===Q.a;
-    const box=el("div","box expl "+(ok?"ok":"bad"));
-    box.appendChild(el("h4",null,ok?"✔ RESPOSTA CORRETA":"✘ RESPOSTA INCORRETA · correta: "+"ABCD"[Q.a]));
-    box.appendChild(el("p",null,Q.x));
-    card.appendChild(box);
+};
+
+/* ---------- armazenamento local (por navegador) ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} }
+};
+const K_HIST = "sc200-hist", K_STATS = "sc200-stats", K_SESS = "sc200-sess";
+
+/* ---------- Claude (tira-dúvidas) ---------- */
+let sample = null;
+const sampleReady = (window.claude && typeof window.claude.use === "function")
+  ? window.claude.use("sample").then(s => (sample = s)).catch(() => null)
+  : Promise.resolve(null);
+let tutorOff = !(window.claude && typeof window.claude.use === "function");
+const chats = {};
+
+/* ---------- utilitários ---------- */
+const $ = s => document.querySelector(s);
+const app = $("#app");
+const L = i => String.fromCharCode(65 + i);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const strip = h => { const t = document.createElement("div"); t.innerHTML = h; return t.textContent; };
+const fmt = s => { s = Math.max(0, s); const m = Math.floor(s / 60), x = s % 60; return `${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}`; };
+const learnUrl = k => "https://learn.microsoft.com/pt-br/search/?terms=" + encodeURIComponent(k);
+const typ = q => q.t || "mc";
+const isRight = it => {
+  const q = Q[it.qi], a = q.a;
+  if (typ(q) === "mc") return it.sel.length === a.length && a.every(x => it.sel.includes(x));
+  return a.every((v, i) => it.sel[i] === v);
+};
+const anyAns = it => typ(Q[it.qi]) === "mc" ? it.sel.length > 0 : it.sel.some(v => v !== null && v !== undefined);
+const fullAns = it => typ(Q[it.qi]) === "mc" ? it.sel.length > 0 : it.sel.every(v => v !== null && v !== undefined);
+const nSlots = q => ({ yn: () => q.s.length, hot: () => q.opts.length, drag: () => q.targets.length })[typ(q)]?.() ?? 0;
+const TYPE_LABEL = { mc: "", yn: "Sim / Não", hot: "Hotspot", drag: "Arrastar e soltar" };
+
+let S = null;     // sessão atual
+let tick = null;
+let cfg = { mode: "treino", dom: "all", n: "all", shuffle: true, pool: "all" };
+
+/* ---------- tela inicial ---------- */
+function home() {
+  stopTimer(); setBar("", 0);
+  const hist = store.get(K_HIST, []);
+  const stats = store.get(K_STATS, {});
+  const saved = store.get(K_SESS, null);
+  const wrongIds = Object.keys(stats).filter(k => stats[k].w > 0 && stats[k].last === 0).map(Number);
+  const byDom = [1, 2, 3, 4].map(d => {
+    const ids = Q.map((q, i) => i).filter(i => Q[i].d === d);
+    const seen = ids.filter(i => stats[i]); const ok = seen.filter(i => stats[i].last === 1).length;
+    return { d, total: ids.length, seen: seen.length, pct: seen.length ? Math.round(ok / seen.length * 100) : null };
+  });
+
+  app.innerHTML = `
+  <section class="hero">
+    <div class="label">Microsoft Security Operations Analyst</div>
+    <h1>Simulado SC-200 em português</h1>
+    <p>${Q.length} questões originais, escritas a partir do guia oficial de habilidades, nos formatos da prova: múltipla escolha, telas simuladas, hotspot, arrastar e soltar, sim/não e estudo de caso. Cada questão tem resposta comentada, o conceito-chave e um tira-dúvidas com o Claude.</p>
+  </section>
+
+  ${saved ? `<div class="panel row"><div><b>Você tem uma tentativa em andamento.</b><div class="note">${saved.mode === "prova" ? "Modo prova" : "Modo treino"} · questão ${saved.idx + 1} de ${saved.items.length}</div></div><div class="spacer"></div><button class="btn ghost" id="discard">Descartar</button><button class="btn primary" id="resume">Continuar</button></div>` : ""}
+
+  <div class="panel">
+    <div class="label">Modo</div>
+    <div class="modes" style="margin-top:8px">
+      <button class="mode" data-mode="treino" aria-pressed="${cfg.mode === "treino"}"><b>Treino</b><small>Corrige na hora, explica a resposta e libera o tira-dúvidas em cada questão.</small></button>
+      <button class="mode" data-mode="prova" aria-pressed="${cfg.mode === "prova"}"><b>Prova</b><small>Cronômetro (100 s por questão), marcar para revisão e nota de 0 a 1000 no final.</small></button>
+    </div>
+    <div class="fields">
+      <label class="field"><span class="label">Domínio</span>
+        <select id="fDom"><option value="all">Todos os domínios</option>${[1,2,3,4].map(d => `<option value="${d}" ${cfg.dom == d ? "selected" : ""}>${d}. ${DOM[d]}</option>`).join("")}</select></label>
+      <label class="field"><span class="label">Quantidade</span>
+        <select id="fN">${["10","20","30","all"].map(n => `<option ${cfg.n === n ? "selected" : ""} value="${n}">${n === "all" ? `Todas (${Q.length})` : n + " questões"}</option>`).join("")}</select></label>
+      <label class="field"><span class="label">Quais questões</span>
+        <select id="fPool"><option value="all">Todas</option><option value="fmt" ${cfg.pool === "fmt" ? "selected" : ""}>Só formatos da prova (imagem, hotspot, arrastar, sim/não, caso)</option><option value="wrong" ${cfg.pool === "wrong" ? "selected" : ""} ${wrongIds.length ? "" : "disabled"}>Só as que errei por último (${wrongIds.length})</option><option value="new" ${cfg.pool === "new" ? "selected" : ""}>Só as que nunca respondi</option></select></label>
+    </div>
+    <label class="check" style="margin-top:14px"><input type="checkbox" id="fShuf" ${cfg.shuffle ? "checked" : ""}> Embaralhar questões e alternativas</label>
+    <div class="row" style="margin-top:16px"><div class="spacer"></div><button class="btn primary" id="go">Começar</button></div>
+    <div id="startMsg" class="note"></div>
+  </div>
+
+  <div class="panel">
+    <div class="label">Seu desempenho por domínio</div>
+    <div class="domains">${byDom.map(x => `
+      <div class="dom"><span class="tag">D${x.d}</span><span>${DOM[x.d]}<br><span class="note">${x.seen} de ${x.total} respondidas</span></span>
+      <span class="row" style="gap:8px"><span class="meter"><i style="width:${x.pct ?? 0}%"></i></span><span class="stat">${x.pct === null ? "—" : x.pct + "%"}</span></span></div>`).join("")}
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="row"><div class="label">Histórico</div><div class="spacer"></div>${hist.length ? `<button class="btn ghost" id="clr" style="padding:4px 10px;font-size:14px">Apagar histórico</button>` : ""}</div>
+    <div id="clrConfirm"></div>
+    ${hist.length ? `<div class="tbl"><table class="hist"><tr><th>Data</th><th>Modo</th><th>Acertos</th><th>Nota</th></tr>
+      ${hist.slice().reverse().slice(0, 12).map(h => `<tr><td>${new Date(h.t).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</td><td>${h.mode === "prova" ? "Prova" : "Treino"}</td><td>${h.ok}/${h.n}</td><td><span class="pill ${h.score >= 700 ? "ok" : "bad"}">${h.score}</span></td></tr>`).join("")}</table></div>`
+      : `<p class="note" style="margin:8px 0 0">Nenhuma tentativa ainda. Suas notas aparecem aqui ao terminar um simulado (ficam salvas neste navegador).</p>`}
+  </div>`;
+
+  app.querySelectorAll(".mode").forEach(b => b.onclick = () => { cfg.mode = b.dataset.mode; app.querySelectorAll(".mode").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  $("#go").onclick = () => {
+    cfg.dom = $("#fDom").value; cfg.n = $("#fN").value; cfg.pool = $("#fPool").value; cfg.shuffle = $("#fShuf").checked;
+    let ids = Q.map((q, i) => i).filter(i => cfg.dom === "all" || Q[i].d == cfg.dom);
+    if (cfg.pool === "wrong") ids = ids.filter(i => wrongIds.includes(i));
+    if (cfg.pool === "new") ids = ids.filter(i => !stats[i]);
+    if (cfg.pool === "fmt") ids = ids.filter(i => Q[i].t || Q[i].scr || Q[i].cs);
+    if (!ids.length) { $("#startMsg").textContent = "Nenhuma questão atende a esses filtros. Escolha outro domínio ou \"Todas\"."; return; }
+    if (cfg.shuffle) ids = shuffle(ids);
+    start(cfg.n === "all" ? ids : ids.slice(0, Number(cfg.n)), cfg.mode);
+  };
+  if (saved) { $("#resume").onclick = () => { S = saved; S.resumedAt = Date.now(); render(); startTimer(); }; $("#discard").onclick = () => { store.del(K_SESS); home(); }; }
+  const clr = $("#clr");
+  if (clr) clr.onclick = () => {
+    $("#clrConfirm").innerHTML = `<div class="confirm row">Apagar histórico e desempenho deste navegador?<div class="spacer"></div><button class="btn ghost" id="no">Cancelar</button><button class="btn primary" id="yes">Apagar</button></div>`;
+    $("#no").onclick = () => $("#clrConfirm").innerHTML = "";
+    $("#yes").onclick = () => { store.del(K_HIST); store.del(K_STATS); home(); };
+  };
+}
+
+/* ---------- sessão ---------- */
+function start(ids, mode) {
+  S = { mode, idx: 0, finished: false, used: 0, limit: mode === "prova" ? ids.length * 100 : 0,
+        items: ids.map(qi => {
+          const q = Q[qi], t = typ(q);
+          const base = t === "mc" ? q.o.map((_, i) => i) : t === "drag" ? q.pool.map((_, i) => i) : [];
+          return { qi, order: cfg.shuffle || t === "drag" ? shuffle(base) : base, sel: t === "mc" ? [] : Array(nSlots(q)).fill(null), done: false, mk: false };
+        }) };
+  S.resumedAt = Date.now();
+  save(); render(); startTimer();
+}
+function save() { if (S && !S.finished) store.set(K_SESS, { ...S, used: elapsed() , resumedAt: undefined }); }
+function elapsed() { return S ? S.used + (S.resumedAt ? Math.floor((Date.now() - S.resumedAt) / 1000) : 0) : 0; }
+function startTimer() {
+  stopTimer();
+  const t = $("#timer");
+  if (!S || S.mode !== "prova" || S.finished) { t.hidden = true; return; }
+  t.hidden = false;
+  const upd = () => { const left = S.limit - elapsed(); t.textContent = fmt(left); t.classList.toggle("low", left < 300); if (left <= 0) finish(); };
+  upd(); tick = setInterval(upd, 1000);
+}
+function stopTimer() { if (tick) clearInterval(tick); tick = null; }
+function setBar(txt, pct) { $("#barStat").textContent = txt; $("#prog").style.width = pct + "%"; }
+
+/* ---------- questão ---------- */
+let pick = null; // item escolhido no arrastar e soltar (toque)
+
+function qBody(it, live) {
+  const q = Q[it.qi], t = typ(q);
+  const cs = q.cs ? `<details class="case" ${live ? "open" : ""}><summary>${CASES[q.cs].title}</summary><div class="cbody">${CASES[q.cs].html}</div></details>` : "";
+  const scr = q.scr ? `<div class="screen"><div class="cap"><b>${q.scr.cap}</b><span>Tela ilustrativa</span></div><div class="scr">${q.scr.html}</div></div>` : "";
+  let hint = "";
+  if (t === "mc" && q.a.length > 1) hint = `Selecione ${q.a.length} alternativas.`;
+  if (t === "hot") hint = "Escolha uma opção em cada lista.";
+  if (t === "drag") hint = "Arraste cada item até o destino certo, ou toque no item e depois no destino. Toque em um destino preenchido para devolver o item.";
+  if (t === "yn") hint = "Marque Sim ou Não em cada linha.";
+  return `${cs}<div class="qtext" ${cs ? 'style="margin-top:12px"' : ""}>${q.q}</div>${hint && live ? `<div class="qhint">${hint}</div>` : ""}${scr}${answerUI(it, live)}`;
+}
+
+function answerUI(it, live) {
+  const q = Q[it.qi], t = typ(q);
+  if (t === "mc") {
+    const multi = q.a.length > 1;
+    return `<div class="opts" role="${multi ? "group" : "radiogroup"}">${it.order.map((oi, pos) => {
+      let cls = it.sel.includes(oi) ? "sel" : "";
+      if (!live) cls = q.a.includes(oi) ? "right" : (it.sel.includes(oi) ? "wrong" : "");
+      return live
+        ? `<label class="opt ${cls}"><input type="${multi ? "checkbox" : "radio"}" name="opt" value="${oi}" ${it.sel.includes(oi) ? "checked" : ""}><span class="key">${L(pos)}</span><span class="body">${q.o[oi]}</span></label>`
+        : `<div class="opt locked ${cls}"><span class="key">${L(pos)}</span><span class="body">${q.o[oi]}</span></div>`;
+    }).join("")}</div>`;
   }
-
-  const act=el("div","actions");
-  const prev=el("button","btn","Anterior");prev.disabled=i===0;prev.onclick=()=>go(i-1);
-  const mark=el("button","btn"+(state.mk[i]?" marked":""),state.mk[i]?"★ Marcada para revisão":"Marcar para revisão");
-  mark.onclick=()=>{state.mk[i]=!state.mk[i];if(!state.mk[i])delete state.mk[i];save();render();};
-  const hint=el("button","btn",h===0?"Pedir dica":h===1?"Mais uma dica":"Dicas usadas");
-  hint.disabled=h>=2||A.done;hint.onclick=()=>{state.hint[i]=h+1;const a=state.ans[i];if(a&&Q.e.includes(a.sel))delete a.sel;save();render();};
-  const conf=el("button","btn primary","Confirmar resposta");
-  conf.disabled=A.done||A.sel==null;conf.onclick=confirm;
-  const next=el("button","btn",i===N-1?"Ver resultado":"Próxima");
-  next.onclick=()=>i===N-1?showResult():go(i+1);
-  act.append(prev,mark,hint,el("div","spacer"),conf,next);
-  card.appendChild(act);
-  card.appendChild(el("div","kbd","Atalhos: A–D seleciona · Enter confirma · ← → navega"));
+  if (t === "yn") {
+    return `<div class="tbl"><table class="yn"><tr><th>Afirmação</th><th>Sim</th><th>Não</th>${live ? "" : "<th>Correta</th>"}</tr>${q.s.map((s, i) => {
+      const v = it.sel[i], rc = live ? "" : (v === q.a[i] ? "right" : "wrong");
+      return `<tr class="${rc}"><td>${s}</td>
+        <td class="c"><input type="radio" name="yn${i}" data-i="${i}" value="1" ${v === true ? "checked" : ""} ${live ? "" : "disabled"} aria-label="Sim, afirmação ${i + 1}"></td>
+        <td class="c"><input type="radio" name="yn${i}" data-i="${i}" value="0" ${v === false ? "checked" : ""} ${live ? "" : "disabled"} aria-label="Não, afirmação ${i + 1}"></td>
+        ${live ? "" : `<td class="c"><span class="mark ${v === q.a[i] ? "ok" : "bad"}">${q.a[i] ? "Sim" : "Não"}</span></td>`}</tr>`;
+    }).join("")}</table></div>`;
+  }
+  if (t === "hot") {
+    const html = q.tpl.replace(/\{\{(\d+)\}\}/g, (m, n) => {
+      n = Number(n); const v = it.sel[n], opts = q.opts[n];
+      if (live) return `<select class="hs" data-slot="${n}" aria-label="Lacuna ${n + 1}"><option value="">— escolha —</option>${opts.map((o, j) => `<option value="${j}" ${v === j ? "selected" : ""}>${o}</option>`).join("")}</select>`;
+      if (v === q.a[n]) return `<span class="hsv ok">${opts[v]}</span>`;
+      return `${v !== null ? `<span class="hsv bad">${opts[v]}</span> ` : ""}<span class="hsv ok">${opts[q.a[n]]}</span>`;
+    });
+    return `<div class="hot">${html}</div>`;
+  }
+  // drag
+  const used = new Set(it.sel.filter(v => v !== null));
+  const pool = live ? `<div><h4>Itens</h4><div class="pool">${it.order.filter(pi => !used.has(pi)).map(pi => `<button class="dchip ${pick === pi ? "picked" : ""}" draggable="true" data-pi="${pi}">${q.pool[pi]}</button>`).join("") || '<span class="note">Todos os itens foram usados.</span>'}</div></div>` : "";
+  const slots = `<div><h4>${live ? "Destinos" : "Sua resposta"}</h4><div class="slots">${q.targets.map((tg, i) => {
+    const v = it.sel[i];
+    if (live) return `<div class="slot"><span class="lbl">${tg}</span><button class="drop ${v !== null ? "has" : ""}" data-slot="${i}">${v !== null ? q.pool[v] : "Solte aqui"}</button></div>`;
+    const ok = v === q.a[i];
+    return `<div class="slot"><span class="lbl">${tg}</span><div class="drop ${ok ? "ok" : "bad"}">${v !== null ? q.pool[v] : "(vazio)"}${ok ? "" : `<span class="fix">Correto: ${q.pool[q.a[i]]}</span>`}</div></div>`;
+  }).join("")}</div></div>`;
+  return `<div class="dd" ${live ? "" : 'style="grid-template-columns:1fr"'}>${pool}${slots}</div>`;
 }
 
-function renderGrid(){
-  const g=$("grid");g.innerHTML="";
-  QUESTIONS.forEach((Q,i)=>{
-    const c=el("button","cell",String(i+1));
-    const A=state.ans[i];
-    if(A&&A.done)c.classList.add(A.sel===Q.a?"ok":"bad");
-    if(state.mk[i])c.classList.add("mk");
-    if(i===state.cur&&state.view==="q")c.classList.add("cur");
-    c.onclick=()=>go(i);
-    g.appendChild(c);
+function wireBody(it, root) {
+  const q = Q[it.qi], t = typ(q);
+  const refresh = sel => { save(); render(); if (sel) { const el = app.querySelector(sel); if (el) el.focus(); } };
+  if (t === "mc") root.querySelectorAll('input[name="opt"]').forEach(inp => inp.onchange = () => {
+    const v = Number(inp.value);
+    if (q.a.length > 1) it.sel = inp.checked ? [...new Set([...it.sel, v])] : it.sel.filter(x => x !== v);
+    else it.sel = [v];
+    refresh(`input[name="opt"][value="${v}"]`);
   });
+  if (t === "yn") root.querySelectorAll(".yn input").forEach(inp => inp.onchange = () => {
+    it.sel[Number(inp.dataset.i)] = inp.value === "1"; refresh(`.yn input[data-i="${inp.dataset.i}"][value="${inp.value}"]`);
+  });
+  if (t === "hot") root.querySelectorAll("select.hs").forEach(s => s.onchange = () => {
+    it.sel[Number(s.dataset.slot)] = s.value === "" ? null : Number(s.value); refresh(`select.hs[data-slot="${s.dataset.slot}"]`);
+  });
+  if (t === "drag") {
+    root.querySelectorAll(".dchip").forEach(c => {
+      c.onclick = () => { const pi = Number(c.dataset.pi); pick = pick === pi ? null : pi; render(); };
+      c.ondragstart = e => { e.dataTransfer.setData("text/plain", c.dataset.pi); e.dataTransfer.effectAllowed = "move"; };
+    });
+    root.querySelectorAll(".drop").forEach(d => {
+      const slot = Number(d.dataset.slot);
+      d.onclick = () => {
+        if (pick !== null) { it.sel[slot] = pick; pick = null; }
+        else if (it.sel[slot] !== null) it.sel[slot] = null;
+        refresh();
+      };
+      d.ondragover = e => { e.preventDefault(); d.classList.add("over"); };
+      d.ondragleave = () => d.classList.remove("over");
+      d.ondrop = e => { e.preventDefault(); const pi = Number(e.dataTransfer.getData("text/plain")); if (Number.isInteger(pi)) { it.sel[slot] = pi; pick = null; refresh(); } };
+    });
+  }
 }
 
-function renderResult(){
-  card.innerHTML="";
-  const done=QUESTIONS.filter((_,i)=>state.ans[i]&&state.ans[i].done);
-  const right=QUESTIONS.filter((Q,i)=>state.ans[i]&&state.ans[i].done&&state.ans[i].sel===Q.a).length;
-  const pct=N?Math.round(right/N*100):0;
-  const r=el("div","result");
-  r.appendChild(el("h2",null,"Resultado"));
-  r.appendChild(el("p",null,`${done.length} de ${N} respondidas · aprovação na prova: 700/1000`));
-  r.appendChild(el("div","score",`${right}/${N} · ${pct}% ${pct>=70?"✔":""}`));
-  const doms=[...new Set(QUESTIONS.map(q=>q.d))];
-  doms.forEach(d=>{
-    const idx=QUESTIONS.map((q,i)=>q.d===d?i:-1).filter(i=>i>=0);
-    const ok=idx.filter(i=>state.ans[i]&&state.ans[i].done&&state.ans[i].sel===QUESTIONS[i].a).length;
-    const box=el("div","dom");
-    const row=el("div","dom-row");row.append(el("span",null,d),el("span",null,`${ok}/${idx.length}`));
-    const bar=el("div","bar"),fill=el("div");fill.style.width=(ok/idx.length*100)+"%";bar.appendChild(fill);
-    box.append(row,bar);r.appendChild(box);
-  });
-  const wrong=QUESTIONS.map((q,i)=>i).filter(i=>state.ans[i]&&state.ans[i].done&&state.ans[i].sel!==QUESTIONS[i].a);
-  const pend=QUESTIONS.map((q,i)=>i).filter(i=>!(state.ans[i]&&state.ans[i].done));
-  const marked=Object.keys(state.mk).map(Number);
-  [["Erradas",wrong],["Marcadas para revisão",marked],["Não respondidas",pend]].forEach(([t,list])=>{
-    if(!list.length)return;
-    r.appendChild(el("h3",null,`${t} (${list.length})`));
-    const ul=el("ul","wrong-list");
-    list.forEach(i=>{const li=el("li"),a=el("a",null,`Q${i+1} — ${QUESTIONS[i].q.slice(0,80)}${QUESTIONS[i].q.length>80?"…":""}`);a.onclick=()=>go(i);li.appendChild(a);ul.appendChild(li);});
-    r.appendChild(ul);
-  });
-  const back=el("button","btn","Voltar às questões");back.onclick=()=>go(state.cur);
-  const act=el("div","actions");act.appendChild(back);r.appendChild(act);
-  card.appendChild(r);
+function render() {
+  const it = S.items[S.idx], q = Q[it.qi], t = typ(q);
+  const answered = S.items.filter(x => S.mode === "treino" ? x.done : anyAns(x)).length;
+  setBar(`${S.idx + 1}/${S.items.length} · ${answered} respondidas`, answered / S.items.length * 100);
+  const showRes = S.mode === "treino" && it.done;
+  const chip = txt => `<span class="pill" style="background:var(--accent-soft);color:var(--accent)">${txt}</span>`;
+
+  app.innerHTML = `
+  <article class="qcard">
+    <div class="qmeta"><span class="pill" style="background:var(--sunk);color:var(--muted)">D${q.d} · ${DOM[q.d]}</span>${TYPE_LABEL[t] ? chip(TYPE_LABEL[t]) : ""}${q.cs ? chip("Estudo de caso") : ""}${q.scr ? chip("Com imagem") : ""}${it.mk ? `<span class="pill warn">Marcada para revisão</span>` : ""}</div>
+    <div class="label">Questão ${S.idx + 1}</div>
+    ${qBody(it, !showRes)}
+    ${showRes ? explain(it) : ""}
+    <div class="nav">
+      <button class="btn" id="prev" ${S.idx === 0 ? "disabled" : ""}>Anterior</button>
+      <button class="btn ghost" id="mark">${it.mk ? "Desmarcar" : "Marcar para revisão"}</button>
+      <div class="spacer"></div>
+      ${S.mode === "treino" && !it.done ? `<button class="btn primary" id="check" ${fullAns(it) ? "" : "disabled"}>Confirmar resposta</button>` : ""}
+      ${S.idx < S.items.length - 1 ? `<button class="btn ${S.mode === "prova" || it.done ? "primary" : ""}" id="next">Próxima</button>` : `<button class="btn primary" id="end">Finalizar</button>`}
+    </div>
+    <div id="endConfirm"></div>
+  </article>
+  <div class="grid">${S.items.map((x, i) => {
+    let c = "";
+    if (S.mode === "treino" && x.done) c = isRight(x) ? "ok" : "bad"; else if (anyAns(x)) c = "ans";
+    return `<button class="cell ${c} ${i === S.idx ? "cur" : ""} ${x.mk ? "mk" : ""}" data-i="${i}" aria-label="Questão ${i + 1}">${i + 1}</button>`;
+  }).join("")}</div>
+  <div class="legend"><span>● laranja = marcada</span>${S.mode === "treino" ? "<span>verde = acertou · vermelho = errou</span>" : "<span>azul = respondida</span>"}</div>`;
+
+  if (!showRes) wireBody(it, app.querySelector(".qcard"));
+  $("#prev").onclick = () => go(S.idx - 1);
+  $("#mark").onclick = () => { it.mk = !it.mk; save(); render(); };
+  const nx = $("#next"); if (nx) nx.onclick = () => go(S.idx + 1);
+  const ck = $("#check"); if (ck) ck.onclick = () => { it.done = true; record(it); save(); render(); };
+  const en = $("#end"); if (en) en.onclick = askFinish;
+  app.querySelectorAll(".cell").forEach(c => c.onclick = () => go(Number(c.dataset.i)));
+  if (showRes) wireTutor(it, app.querySelector(".tutor"));
+}
+function go(i) { if (i < 0 || i >= S.items.length) return; S.idx = i; pick = null; save(); render(); window.scrollTo({ top: 0 }); }
+function askFinish() {
+  const pend = S.items.filter(x => S.mode === "treino" ? !x.done : !anyAns(x)).length;
+  const mk = S.items.filter(x => x.mk).length;
+  $("#endConfirm").innerHTML = `<div class="confirm row"><span>${pend ? `${pend} questão(ões) sem resposta. ` : ""}${mk ? `${mk} marcada(s) para revisão. ` : ""}Finalizar agora?</span><div class="spacer"></div><button class="btn ghost" id="no">Voltar</button><button class="btn primary" id="yes">Finalizar</button></div>`;
+  $("#no").onclick = () => $("#endConfirm").innerHTML = "";
+  $("#yes").onclick = finish;
+}
+function record(it) {
+  const st = store.get(K_STATS, {}); const r = isRight(it) ? 1 : 0;
+  const s = st[it.qi] || { ok: 0, w: 0 }; r ? s.ok++ : s.w++; s.last = r; st[it.qi] = s; store.set(K_STATS, st);
 }
 
-function select(j){const a=state.ans[state.cur]||{};if(a.done)return;a.sel=j;state.ans[state.cur]=a;save();render();}
-function confirm(){const a=state.ans[state.cur];if(!a||a.sel==null||a.done)return;a.done=true;save();render();}
-function go(i){if(i<0||i>=N)return;state.cur=i;state.view="q";save();render();window.scrollTo({top:0,behavior:"smooth"});}
-function showResult(){state.view="r";render();window.scrollTo({top:0,behavior:"smooth"});}
+/* ---------- explicação + tutor ---------- */
+function answerText(it, mine) {
+  const q = Q[it.qi], t = typ(q), src = mine ? it.sel : q.a, dash = "—";
+  if (t === "mc") return it.order.map((oi, pos) => src.includes(oi) ? L(pos) : null).filter(Boolean).join(" e ") || "nenhuma";
+  if (t === "yn") return src.map((v, i) => `${i + 1}: ${v === null ? dash : v ? "Sim" : "Não"}`).join(" · ");
+  if (t === "hot") return src.map((v, i) => `lacuna ${i + 1}: ${v === null ? dash : strip(q.opts[i][v])}`).join(" · ");
+  return src.map((v, i) => `${strip(q.targets[i])} → ${v === null ? dash : strip(q.pool[v])}`).join(" · ");
+}
 
-$("btnFinish").onclick=showResult;
-$("btnReset").onclick=()=>{if(window.confirm("Apagar todas as respostas e recomeçar?")){state={cur:0,ans:{},mk:{},hint:{},view:"q"};save();render();}};
+function explain(it) {
+  const q = Q[it.qi], ok = isRight(it);
+  return `
+  <div class="verdict ${ok ? "ok" : "bad"}">${ok ? "Correto." : `Incorreto. Resposta certa: ${answerText(it, false)}.`}</div>
+  <div class="learn">
+    <section><h3>Por que essa é a resposta</h3><p>${q.e}</p></section>
+    <section><h3>Conceito-chave</h3><p>${q.c}</p></section>
+    <section><h3>Estude no Microsoft Learn</h3><p><a href="${learnUrl(q.k)}" target="_blank" rel="noopener">Pesquisar “${q.k}” na documentação oficial</a></p></section>
+  </div>
+  <div class="tutor" ${tutorOff ? "hidden" : ""}>
+    <h3>Tirar dúvida com o Claude</h3>
+    <div class="note">Pergunte qualquer coisa sobre esta questão. As respostas usam a sua conta do Claude; a primeira pergunta pede sua permissão.</div>
+    <div class="chips">
+      <button class="chip">Explique de forma mais simples</button>
+      <button class="chip">Por que as outras alternativas estão erradas?</button>
+      <button class="chip">Dê um exemplo prático no dia a dia de um SOC</button>
+      <button class="chip">Como esse tema costuma cair na prova?</button>
+    </div>
+    <div class="msgs"></div>
+    <div class="ask"><textarea id="ask-${it.qi}" rows="2" placeholder="Digite sua dúvida…"></textarea><button class="btn primary" data-send>Perguntar</button></div>
+  </div>`;
+}
 
-document.addEventListener("keydown",e=>{
-  if(state.view!=="q"||e.ctrlKey||e.metaKey||e.altKey)return;
-  const k=e.key.toLowerCase();
-  const idx="abcd".indexOf(k);
-  if(idx>=0){const Q=QUESTIONS[state.cur],h=state.hint[state.cur]||0;if(!(h>=1&&Q.e.includes(idx)))select(idx);}
-  else if(k==="enter")confirm();
-  else if(k==="arrowright")go(state.cur+1);
-  else if(k==="arrowleft")go(state.cur-1);
-});
+function wireTutor(it, box) {
+  if (!box) return;
+  const msgs = box.querySelector(".msgs"), ta = box.querySelector("textarea"), send = box.querySelector("[data-send]");
+  const turns = chats[it.qi] || (chats[it.qi] = []);
+  const draw = () => { msgs.innerHTML = ""; turns.forEach(t => { const d = document.createElement("div"); d.className = "msg " + (t.role === "user" ? "me" : "ai"); d.textContent = t.content; msgs.append(d); }); };
+  draw();
+  sampleReady.then(s => { if (!s) box.hidden = true; });
+  let busy = false;
+  const ask = async text => {
+    text = text.trim(); if (!text || busy || !sample) return;
+    busy = true; send.disabled = true; ta.value = "";
+    turns.push({ role: "user", content: text }); draw();
+    const out = document.createElement("div"); out.className = "msg ai"; out.textContent = "Pensando…"; msgs.append(out);
+    try {
+      const { text: ans } = await sample([{ role: "user", content: context(it) }, ...turns], { cache: false, onText: ({ text }) => { out.textContent = text; } });
+      turns.push({ role: "assistant", content: ans });
+    } catch (e) {
+      turns.pop();
+      if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(e.code)) { tutorOff = true; box.hidden = true; return; }
+      out.className = "msg err";
+      out.textContent = e.code === "rate_limited" ? "Muitas perguntas seguidas ou limite de uso atingido. Espere um pouco e tente de novo."
+        : e.code === "session_expired" ? "Sua sessão expirou. Entre de novo no claude.ai e tente outra vez."
+        : e.code === "refused" ? "O Claude não respondeu a essa pergunta. Tente reformular."
+        : "Não foi possível obter a resposta agora. Tente de novo.";
+    } finally { busy = false; send.disabled = false; }
+  };
+  send.onclick = () => ask(ta.value);
+  ta.onkeydown = e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(ta.value); } };
+  box.querySelectorAll(".chip").forEach(c => c.onclick = () => ask(c.textContent));
+}
 
-render();
+function context(it) {
+  const q = Q[it.qi], t = typ(q);
+  let alts;
+  if (t === "mc") alts = "Alternativas:\n" + it.order.map((oi, pos) => `${L(pos)}) ${strip(q.o[oi])}`).join("\n");
+  else if (t === "yn") alts = "Formato: Sim/Não. Afirmações:\n" + q.s.map((s, i) => `${i + 1}) ${strip(s)}`).join("\n");
+  else if (t === "hot") alts = "Formato: hotspot (lacunas com listas de opções). Texto:\n" + strip(q.tpl.replace(/\{\{(\d+)\}\}/g, (m, n) => `[lacuna ${Number(n) + 1}]`)) + "\nOpções:\n" + q.opts.map((o, i) => `lacuna ${i + 1}: ${o.map(strip).join(" | ")}`).join("\n");
+  else alts = "Formato: arrastar e soltar. Destinos:\n" + q.targets.map((x, i) => `${i + 1}) ${strip(x)}`).join("\n") + "\nItens disponíveis: " + q.pool.map(strip).join(" | ");
+  const extra = (q.cs ? `\nEstudo de caso:\n${strip(CASES[q.cs].html)}\n` : "") + (q.scr ? `\nConteúdo da tela mostrada na questão (${q.scr.cap}):\n${strip(q.scr.html)}\n` : "");
+  const right = answerText(it, false), mine = answerText(it, true);
+  return `Você é um tutor da certificação Microsoft SC-200 (Microsoft Security Operations Analyst). Responda sempre em português do Brasil, em texto simples (sem Markdown, sem tabelas), de forma didática e direta, com no máximo cerca de 200 palavras, a menos que o aluno peça mais detalhes. Use os nomes atuais dos produtos (Microsoft Defender XDR, Microsoft Sentinel, Microsoft Entra ID). Se não tiver certeza de um detalhe, diga isso e sugira conferir no Microsoft Learn.
+
+Domínio: ${DOM[q.d]}
+${extra}Questão: ${strip(q.q)}
+${alts}
+Resposta correta: ${right}
+Resposta do aluno: ${mine}
+Explicação oficial do simulado: ${strip(q.e)}
+Conceito-chave: ${strip(q.c)}
+
+A seguir vêm as dúvidas do aluno sobre esta questão.`;
+}
+
+/* ---------- resultado ---------- */
+function finish() {
+  stopTimer();
+  S.used = elapsed(); S.resumedAt = null; S.finished = true;
+  if (S.mode === "prova") S.items.forEach(x => { x.done = true; if (anyAns(x)) record(x); });
+  const ok = S.items.filter(x => x.done && isRight(x)).length;
+  const n = S.items.length, score = Math.round(ok / n * 1000);
+  const hist = store.get(K_HIST, []); hist.push({ t: Date.now(), mode: S.mode, n, ok, score }); store.set(K_HIST, hist.slice(-50));
+  store.del(K_SESS);
+  results(ok, n, score);
+}
+
+function results(ok, n, score) {
+  $("#timer").hidden = true; setBar("Resultado", 100);
+  const doms = [1, 2, 3, 4].map(d => { const xs = S.items.filter(x => Q[x.qi].d === d); return { d, n: xs.length, ok: xs.filter(isRight).length }; }).filter(x => x.n);
+  const wrong = S.items.filter(x => !isRight(x));
+  app.innerHTML = `
+  <div class="panel">
+    <div class="label">${S.mode === "prova" ? "Modo prova" : "Modo treino"} · tempo ${fmt(S.used)}</div>
+    <div class="score" style="margin-top:8px">
+      <div class="big">${score}<small> / 1000</small></div>
+      <div><span class="pill ${score >= 700 ? "ok" : "bad"}">${score >= 700 ? "Aprovado (meta 700)" : "Abaixo de 700"}</span><div class="note" style="margin-top:6px">${ok} de ${n} corretas</div></div>
+    </div>
+    <div class="domains" style="margin-top:16px">${doms.map(x => { const p = Math.round(x.ok / x.n * 100); return `
+      <div class="dom"><span class="tag">D${x.d}</span><span>${DOM[x.d]}</span><span class="row" style="gap:8px"><span class="meter"><i style="width:${p}%"></i></span><span class="stat">${x.ok}/${x.n}</span></span></div>`; }).join("")}</div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" id="home">Início</button><div class="spacer"></div>
+      ${wrong.length ? `<button class="btn primary" id="retry">Refazer as ${wrong.length} que errei</button>` : ""}
+    </div>
+  </div>
+  <h2 style="margin-top:24px;font-size:20px">Revisão das questões</h2>
+  <p class="note">Abra uma questão para ver a explicação e tirar dúvidas com o Claude.</p>
+  <div class="review">${S.items.map((x, i) => `
+    <details class="rv" data-i="${i}"><summary><span class="pill ${isRight(x) ? "ok" : anyAns(x) ? "bad" : "warn"}">${isRight(x) ? "Certa" : anyAns(x) ? "Errada" : "Em branco"}</span><span class="stat">${i + 1}.</span><span class="t">${strip(Q[x.qi].q)}</span></summary><div class="rvbody"></div></details>`).join("")}</div>`;
+
+  $("#home").onclick = home;
+  const rt = $("#retry"); if (rt) rt.onclick = () => start(shuffle(wrong.map(x => x.qi)), "treino");
+  app.querySelectorAll("details.rv").forEach(d => d.addEventListener("toggle", () => {
+    if (!d.open) return; const body = d.querySelector(".rvbody"); if (body.dataset.on) return; body.dataset.on = 1;
+    const it = S.items[Number(d.dataset.i)];
+    body.innerHTML = `<div style="margin-top:10px">${qBody(it, false)}</div>${explain(it)}`;
+    wireTutor(it, body.querySelector(".tutor"));
+  }));
+  window.scrollTo({ top: 0 });
+}
+
+window.addEventListener("beforeunload", save);
+document.addEventListener("visibilitychange", () => { if (document.hidden) save(); });
+home();
 </script>
-</body>
-</html>
+
+</body></html>
