@@ -104,6 +104,14 @@ table.hist th { color: var(--muted); font-weight: 600; }
 .opt.elim { opacity: .4; text-decoration: line-through; }
 .hintbox { margin-top: 16px; padding: 12px 14px; border: 1.5px dashed var(--warn); border-radius: 8px; background: var(--warn-soft); }
 .hintbox p { margin: 4px 0 0; }
+.ms { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.ms-h { font-family: var(--f-display); font-weight: 700; margin-top: 12px; }
+.ms-ans { margin-top: 6px; padding: 10px 12px; border-radius: 8px; border: 1.5px solid var(--line); }
+.ms-okbox { border-color: var(--ok); background: var(--ok-soft); }
+.ms-badbox { border-color: var(--bad); background: var(--bad-soft); }
+.ms-note { margin-top: 6px; font-weight: 700; font-size: 15px; }
+.ms-ok { color: var(--ok); } .ms-bad { color: var(--bad); }
+.ms-line { margin: 10px 0 0; max-width: 75ch; }
 .opt .body { min-width: 0; }
 .opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 
@@ -965,7 +973,7 @@ function home() {
     <div class="label">Modo</div>
     <div class="modes" style="margin-top:8px">
       <button class="mode" data-mode="treino" aria-pressed="${cfg.mode === "treino"}"><b>Aprendizagem · com dicas</b><small>Botão de dica em cada questão, correção na hora e explicação da resposta.</small></button>
-      <button class="mode" data-mode="pratica" aria-pressed="${cfg.mode === "pratica"}"><b>Avaliação prática · 50</b><small>No formato da avaliação prática da Microsoft: 50 questões, sem correção até o fim e resumo explicando cada alternativa.</small></button>
+      <button class="mode" data-mode="pratica" aria-pressed="${cfg.mode === "pratica"}"><b>Avaliação prática · 50</b><small>50 questões no formato da avaliação prática da Microsoft: responda cada uma, use até 2 dicas e veja na hora por que cada alternativa está certa ou errada.</small></button>
       <button class="mode" data-mode="prova" aria-pressed="${cfg.mode === "prova"}"><b>Prova · sem dicas</b><small>Como a prova real: sem dicas nem correção até o fim, com cronômetro (100 s por questão) e nota de 0 a 100.</small></button>
     </div>
     <div class="fields">
@@ -1138,9 +1146,9 @@ function wireBody(it, root) {
 
 function render() {
   const it = S.items[S.idx], q = Q[it.qi], t = typ(q);
-  const answered = S.items.filter(x => S.mode === "treino" ? x.done : anyAns(x)).length;
+  const answered = S.items.filter(x => isLearn() ? x.done : anyAns(x)).length;
   setBar(`${S.idx + 1}/${S.items.length} · ${answered} respondidas`, answered / S.items.length * 100);
-  const showRes = S.mode === "treino" && it.done;
+  const showRes = isLearn() && it.done;
   const chip = txt => `<span class="pill" style="background:var(--accent-soft);color:var(--accent)">${txt}</span>`;
 
   app.innerHTML = `
@@ -1148,24 +1156,24 @@ function render() {
     <div class="qmeta"><span class="pill" style="background:var(--sunk);color:var(--muted)">D${q.d} · ${DOM[q.d]}</span>${TYPE_LABEL[t] ? chip(TYPE_LABEL[t]) : ""}${q.cs ? chip("Estudo de caso") : ""}${q.scr ? chip("Com imagem") : ""}${it.mk ? `<span class="pill warn">Marcada para revisão</span>` : ""}</div>
     <div class="label">Questão ${S.idx + 1}</div>
     ${qBody(it, !showRes)}
-    ${S.mode === "treino" && it.h ? hintBox(it) : ""}
+    ${isLearn() && it.h ? hintBox(it) : ""}
     ${showRes ? explain(it) : ""}
     <div class="nav">
       <button class="btn" id="prev" ${S.idx === 0 ? "disabled" : ""}>Anterior</button>
       <button class="btn ghost" id="mark">${it.mk ? "Desmarcar" : "Marcar para revisão"}</button>
-      ${S.mode === "treino" && !it.done ? `<button class="btn ghost" id="hint" ${(it.h || 0) >= maxHints(it) ? "disabled" : ""}>${(it.h || 0) === 0 ? "Pedir dica" : (it.h || 0) < maxHints(it) ? "Mais uma dica" : "Dicas usadas"}</button>` : ""}
+      ${isLearn() && !it.done ? `<button class="btn ghost" id="hint" ${(it.h || 0) >= maxHints(it) ? "disabled" : ""}>${(it.h || 0) === 0 ? "Pedir dica" : (it.h || 0) < maxHints(it) ? "Mais uma dica" : "Dicas usadas"}</button>` : ""}
       <div class="spacer"></div>
-      ${S.mode === "treino" && !it.done ? `<button class="btn primary" id="check" ${fullAns(it) ? "" : "disabled"}>Confirmar resposta</button>` : ""}
-      ${S.idx < S.items.length - 1 ? `<button class="btn ${S.mode !== "treino" || it.done ? "primary" : ""}" id="next">Próxima</button>` : `<button class="btn primary" id="end">Finalizar</button>`}
+      ${isLearn() && !it.done ? `<button class="btn primary" id="check" ${fullAns(it) ? "" : "disabled"}>Confirmar resposta</button>` : ""}
+      ${S.idx < S.items.length - 1 ? `<button class="btn ${!isLearn() || it.done ? "primary" : ""}" id="next">Próxima</button>` : `<button class="btn primary" id="end">Finalizar</button>`}
     </div>
     <div id="endConfirm"></div>
   </article>
   <div class="grid">${S.items.map((x, i) => {
     let c = "";
-    if (S.mode === "treino" && x.done) c = isRight(x) ? "ok" : "bad"; else if (anyAns(x)) c = "ans";
+    if (isLearn() && x.done) c = isRight(x) ? "ok" : "bad"; else if (anyAns(x)) c = "ans";
     return `<button class="cell ${c} ${i === S.idx ? "cur" : ""} ${x.mk ? "mk" : ""}" data-i="${i}" aria-label="Questão ${i + 1}">${i + 1}</button>`;
   }).join("")}</div>
-  <div class="legend"><span>● laranja = marcada</span>${S.mode === "treino" ? "<span>verde = acertou · vermelho = errou</span>" : "<span>azul = respondida</span>"}</div>`;
+  <div class="legend"><span>● laranja = marcada</span>${isLearn() ? "<span>verde = acertou · vermelho = errou</span>" : "<span>azul = respondida</span>"}</div>`;
 
   if (!showRes) wireBody(it, app.querySelector(".qcard"));
   $("#prev").onclick = () => go(S.idx - 1);
@@ -1178,9 +1186,10 @@ function render() {
   if (showRes) wireTutor(it, app.querySelector(".tutor"));
 }
 /* ---------- dicas (modo aprendizagem) ---------- */
+function isLearn() { return S && (S.mode === "treino" || S.mode === "pratica"); }
 function wrongOpts(it) { const q = Q[it.qi]; return typ(q) === "mc" ? it.order.filter(oi => !q.a.includes(oi)) : []; }
 function nElim(it) { return Math.min(2, Math.max(0, wrongOpts(it).length - 1)); }
-function maxHints(it) { return nElim(it) > 0 ? 2 : 1; }
+function maxHints(it) { return nElim(it) > 0 || typ(Q[it.qi]) === "yn" ? 2 : 1; }
 function useHint(it) {
   const h = it.h || 0; if (h >= maxHints(it)) return;
   if (h === 0 && nElim(it) > 0) { it.elim = wrongOpts(it).slice(0, nElim(it)); it.sel = it.sel.filter(x => !it.elim.includes(x)); }
@@ -1188,13 +1197,15 @@ function useHint(it) {
 }
 function hintBox(it) {
   const q = Q[it.qi], n = nElim(it), lines = [];
+  const yn = typ(q) === "yn", two = maxHints(it) === 2;
   if (n > 0) lines.push(`<p><b>Dica 1:</b> ${n === 1 ? "1 alternativa errada foi eliminada." : n + " alternativas erradas foram eliminadas."}</p>`);
-  if (it.h >= maxHints(it)) lines.push(`<p><b>Dica ${n > 0 ? 2 : 1} · conceito-chave:</b> ${q.c}</p>`);
+  if (yn) { const t = q.a.filter(Boolean).length; lines.push(`<p><b>Dica 1:</b> ${t} de ${q.a.length} afirmações são verdadeiras.</p>`); }
+  if (it.h >= maxHints(it)) lines.push(`<p><b>Dica ${two ? 2 : 1} · conceito-chave:</b> ${q.c}</p>`);
   return `<div class="hintbox"><div class="label" style="color:var(--warn)">Dicas</div>${lines.join("")}</div>`;
 }
 function go(i) { if (i < 0 || i >= S.items.length) return; S.idx = i; pick = null; save(); render(); window.scrollTo({ top: 0 }); }
 function askFinish() {
-  const pend = S.items.filter(x => S.mode === "treino" ? !x.done : !anyAns(x)).length;
+  const pend = S.items.filter(x => isLearn() ? !x.done : !anyAns(x)).length;
   const mk = S.items.filter(x => x.mk).length;
   $("#endConfirm").innerHTML = `<div class="confirm row"><span>${pend ? `${pend} questão(ões) sem resposta. ` : ""}${mk ? `${mk} marcada(s) para revisão. ` : ""}Finalizar agora?</span><div class="spacer"></div><button class="btn ghost" id="no">Voltar</button><button class="btn primary" id="yes">Finalizar</button></div>`;
   $("#no").onclick = () => $("#endConfirm").innerHTML = "";
@@ -1214,16 +1225,24 @@ function answerText(it, mine) {
   return src.map((v, i) => `${strip(q.targets[i])} → ${v === null ? dash : strip(q.pool[v])}`).join(" · ");
 }
 
-function explain(it) {
-  const q = Q[it.qi], ok = isRight(it);
+function msFeedback(it) {
+  const q = Q[it.qi], ok = isRight(it), t = typ(q);
+  const txt = src => t === "mc" ? (it.order.filter(oi => src.includes(oi)).map(oi => q.o[oi]).join("<br>") || "Sem resposta") : answerText(it, src === it.sel);
+  const mine = t === "mc" ? it.sel : it.sel, right = q.a;
+  const lines = t === "mc" ? [...it.order.filter(oi => q.a.includes(oi)), ...it.order.filter(oi => !q.a.includes(oi))]
+      .map(oi => `<p class="ms-line"><b class="${q.a.includes(oi) ? "ms-ok" : "ms-bad"}">${q.a.includes(oi) ? "Correto" : "Incorreto"}:</b> ${strip(q.o[oi])} – ${q.w[oi]}</p>`).join("")
+    : `<p class="ms-line">${q.e}</p>`;
+  return `<div class="ms">
+    <div class="ms-h">Sua resposta</div><div class="ms-ans ${ok ? "ms-okbox" : "ms-badbox"}">${txt(mine)}</div>
+    <div class="ms-note ${ok ? "ms-ok" : "ms-bad"}">${ok ? "✔ Esta resposta está correta." : "✘ Esta resposta está incorreta."}</div>
+    <div class="ms-h">Resposta correta</div><div class="ms-ans ms-okbox">${t === "mc" ? it.order.filter(oi => right.includes(oi)).map(oi => q.o[oi]).join("<br>") : answerText(it, false)}</div>
+    ${lines}
+    <p class="ms-line"><b>Conceito-chave:</b> ${q.c}</p>
+    <p class="ms-line"><a href="${learnUrl(q.k)}" target="_blank" rel="noopener">${q.k} – Microsoft Learn</a></p>
+  </div>`;
+}
+function tutorBox() {
   return `
-  <div class="verdict ${ok ? "ok" : "bad"}">${ok ? "Correto." : `Incorreto. Resposta certa: ${answerText(it, false)}.`}</div>
-  <div class="learn">
-    <section><h3>Por que essa é a resposta</h3><p>${q.e}</p></section>
-    ${q.w && typ(q) === "mc" ? `<section><h3>Análise das alternativas</h3>${it.order.map((oi, pos) => `<p style="margin:4px 0"><b style="color:var(${q.a.includes(oi) ? "--ok" : "--bad"})">${q.a.includes(oi) ? "Correta" : "Incorreta"} (${L(pos)}):</b> ${q.w[oi]}</p>`).join("")}</section>` : ""}
-    <section><h3>Conceito-chave</h3><p>${q.c}</p></section>
-    <section><h3>Estude no Microsoft Learn</h3><p><a href="${learnUrl(q.k)}" target="_blank" rel="noopener">Pesquisar “${q.k}” na documentação oficial</a></p></section>
-  </div>
   <div class="tutor" ${tutorOff ? "hidden" : ""}>
     <h3>Tirar dúvida com o Claude</h3>
     <div class="note">Pergunte qualquer coisa sobre esta questão. As respostas usam a sua conta do Claude; a primeira pergunta pede sua permissão.</div>
@@ -1234,8 +1253,20 @@ function explain(it) {
       <button class="chip">Como esse tema costuma cair na prova?</button>
     </div>
     <div class="msgs"></div>
-    <div class="ask"><textarea id="ask-${it.qi}" rows="2" placeholder="Digite sua dúvida…"></textarea><button class="btn primary" data-send>Perguntar</button></div>
+    <div class="ask"><textarea  rows="2" placeholder="Digite sua dúvida…"></textarea><button class="btn primary" data-send>Perguntar</button></div>
   </div>`;
+}
+function explain(it) {
+  const q = Q[it.qi], ok = isRight(it);
+  if (q.ap && (q.w || typ(q) === "yn")) return msFeedback(it) + tutorBox();
+  return `
+  <div class="verdict ${ok ? "ok" : "bad"}">${ok ? "Correto." : `Incorreto. Resposta certa: ${answerText(it, false)}.`}</div>
+  <div class="learn">
+    <section><h3>Por que essa é a resposta</h3><p>${q.e}</p></section>
+    ${q.w && typ(q) === "mc" ? `<section><h3>Análise das alternativas</h3>${it.order.map((oi, pos) => `<p style="margin:4px 0"><b style="color:var(${q.a.includes(oi) ? "--ok" : "--bad"})">${q.a.includes(oi) ? "Correta" : "Incorreta"} (${L(pos)}):</b> ${q.w[oi]}</p>`).join("")}</section>` : ""}
+    <section><h3>Conceito-chave</h3><p>${q.c}</p></section>
+    <section><h3>Estude no Microsoft Learn</h3><p><a href="${learnUrl(q.k)}" target="_blank" rel="noopener">Pesquisar “${q.k}” na documentação oficial</a></p></section>
+  </div>` + tutorBox();
 }
 
 function wireTutor(it, box) {
@@ -1295,7 +1326,7 @@ A seguir vêm as dúvidas do aluno sobre esta questão.`;
 function finish() {
   stopTimer();
   S.used = elapsed(); S.resumedAt = null; S.finished = true;
-  if (S.mode !== "treino") S.items.forEach(x => { x.done = true; if (anyAns(x)) record(x); });
+  if (!isLearn()) S.items.forEach(x => { x.done = true; if (anyAns(x)) record(x); });
   const ok = S.items.filter(x => x.done && isRight(x)).length;
   const n = S.items.length, score = Math.round(ok / n * 100);
   const hist = store.get(K_HIST, []); hist.push({ t: Date.now(), mode: S.mode, n, ok, score }); store.set(K_HIST, hist.slice(-50));
