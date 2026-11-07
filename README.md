@@ -1,0 +1,1 @@
+Simulado SC-200
