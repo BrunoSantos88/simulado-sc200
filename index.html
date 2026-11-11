@@ -424,6 +424,7 @@ function renderStart(){
     <div class="row"><button class="primary" id="go" type="button" ${p?'':'disabled'}>Começar · ${cfg.count==='all'?p:Math.min(cfg.count,p)} questões</button>
       ${seen?`<button class="ghost" id="resetHist" type="button">Apagar histórico</button>`:''}
       <span class="note">${p?'':'Nenhuma questão nesse filtro.'}</span></div>
+    <p class="note" style="margin-top:14px;font-size:10pt">Versão 11/11/2026 11:55 · com “Como resolver” e “Análise das alternativas”</p>
   </section>
   <p class="note" style="margin-top:16px">O progresso fica salvo só neste navegador. ${right} acertos e ${wrong} erros registrados.</p>`;
   const bind=(id,key,num)=>app.querySelectorAll(id+' button').forEach(b=>b.onclick=()=>{let v=b.dataset.v;if(num&&v!=='all')v=+v;cfg[key]=v;if(key==='mode'&&v==='exam')cfg.self=false;if(key==='mode'&&v==='kql')cfg.self=true;renderStart()});
